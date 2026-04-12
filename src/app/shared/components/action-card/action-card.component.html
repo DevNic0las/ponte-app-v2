@@ -1,0 +1,11 @@
+<ion-ripple-effect></ion-ripple-effect>
+
+<button
+  class="action-card"
+  ion-activatable
+  (click)="onCardClick()"
+>
+  <ion-ripple-effect></ion-ripple-effect>
+  <ion-icon [name]="card.icon" class="action-card__icon"></ion-icon>
+  <span class="action-card__label">{{ card.label }}</span>
+</button>
