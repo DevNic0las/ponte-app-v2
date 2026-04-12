@@ -1,0 +1,22 @@
+<div
+  class="ticket-card"
+  ion-activatable
+  (click)="onTicketClick()"
+>
+  <ion-ripple-effect></ion-ripple-effect>
+
+  <div class="ticket-card__left">
+    <div class="ticket-card__icon-wrapper">
+      <ion-icon [name]="ticket.icon" class="ticket-card__icon"></ion-icon>
+    </div>
+    <div class="ticket-card__text">
+      <p class="ticket-card__title">{{ ticket.title }}</p>
+      <p class="ticket-card__subtitle">{{ ticket.subtitle }}</p>
+    </div>
+  </div>
+
+  <ion-icon
+    name="chevron-forward-outline"
+    class="ticket-card__chevron"
+  ></ion-icon>
+</div>
