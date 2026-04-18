@@ -1,6 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import {
   IonContent,
   IonGrid,
@@ -15,6 +17,8 @@ import { BottomNavComponent }   from '../../../../shared/components/bottom-nav/b
 
 import { ActionCard } from '../../../../shared/models/action-card.model';
 import { TicketCard } from '../../../../shared/models/ticket-card.model';
+import { DashboardService } from '../../services/dashboard-service';
+import { TicketCount } from "../../models/dashboard-home/ticket-count.interface";
 
 @Component({
   selector: 'app-dashboard',
@@ -34,21 +38,28 @@ import { TicketCard } from '../../../../shared/models/ticket-card.model';
   styleUrls: ['./dashboard.page.scss'],
 })
 export class DashboardHomePage {
+  private readonly router: Router = inject(Router);
+  private readonly dashboardService = inject(DashboardService);
+
   readonly actionCards: ActionCard[] = [
     { icon: 'ticket-outline',      label: 'Atendimento',   route: '/tickets'     },
     { icon: 'add-circle-outline',  label: 'Criar Chamado', route: '/dashboard/new' },
     { icon: 'person-outline',      label: 'Perfil',        route: '/profile'     },
   ];
 
-  readonly ticketCards: TicketCard[] = [
-    { icon: 'alert-circle-outline',     title: 'Novos Chamados',        subtitle: '8 pendentes de revisão',  route: '/tickets/new'         },
-    { icon: 'time-outline',             title: 'Chamados em Andamento', subtitle: '12 em processamento',     route: '/tickets/in-progress' },
-    { icon: 'calendar-outline',         title: 'Chamados Planejados',   subtitle: '5 agendados para hoje',   route: '/tickets/planned'     },
-    { icon: 'checkmark-circle-outline', title: 'Chamados Finalizados',  subtitle: '42 concluídos este mês', route: '/tickets/closed'      },
-  ];
+  ticketCards$: Observable<TicketCard[]> = this.dashboardService
+  .countTicketsByStatus()
+  .pipe(
+    map(counts => [
+      { icon: 'alert-circle-outline',     title: 'Novos Chamados',        subtitle: `${counts.open} abertos`,          route: '/tickets/new'         },
+      { icon: 'time-outline',             title: 'Chamados em Andamento', subtitle: `${counts.inProgress} andamento`,  route: '/tickets/in-progress' },
+      { icon: 'calendar-outline',         title: 'Chamados Planejados',   subtitle: `${counts.pending} pendentes`,     route: '/tickets/planned'     },
+      { icon: 'checkmark-circle-outline', title: 'Chamados Finalizados',  subtitle: `${counts.closed} concluídos`,     route: '/tickets/closed'      },
+    ])
+  );
 
-  private readonly router: Router = inject(Router);
-
+  
+  
   onActionCardClick(card: ActionCard): void {
     this.router.navigate([card.route]);
   }
@@ -56,4 +67,6 @@ export class DashboardHomePage {
   onTicketCardClick(ticket: TicketCard): void {
     this.router.navigate([ticket.route]);
   }
+
+ 
 }
