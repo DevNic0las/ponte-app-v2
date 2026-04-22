@@ -3,7 +3,6 @@
 
   <ion-content class="dashboard-content">
     <div class="dashboard-content__inner">
-
       <div class="dashboard-hero">
         <p class="dashboard-hero__eyebrow">Dashboard</p>
         <h2 class="dashboard-hero__title">Como podemos ajudar?</h2>
@@ -13,12 +12,12 @@
         <ion-grid>
           <ion-row>
             @for (card of actionCards; track card.route) {
-              <ion-col size="4" size-md="3">
-                <app-action-card
-                  [card]="card"
-                  (cardClick)="onActionCardClick($event)"
-                ></app-action-card>
-              </ion-col>
+            <ion-col size="4" size-md="3">
+              <app-action-card
+                [card]="card"
+                (cardClick)="onActionCardClick($event)"
+              ></app-action-card>
+            </ion-col>
             }
           </ion-row>
         </ion-grid>
@@ -28,24 +27,21 @@
         <p class="dashboard-tickets__label">Gestão de Chamados</p>
         <ion-grid>
           <ion-row>
-            @if (ticketCards$ | async; as cards) {
-              @for (ticket of cards; track ticket.route) {
-                <ion-col size="12" size-md="6">
-                  <app-ticket-card
-                    [ticket]="ticket"
-                    (ticketClick)="onTicketCardClick($event)"
-                  ></app-ticket-card>
-                </ion-col>
-              }
-            } @else {
-              <ion-col size="12">
-                <p>Carregando...</p>
-              </ion-col>
+            @if (ticketCards$ | async; as cards) { @for (ticket of cards; track ticket.route) {
+            <ion-col size="12" size-md="6">
+              <app-ticket-card
+                [ticket]="ticket"
+                (ticketClick)="onTicketCardClick($event)"
+              ></app-ticket-card>
+            </ion-col>
+            } } @else {
+            <ion-col size="12">
+              <p>Carregando...</p>
+            </ion-col>
             }
           </ion-row>
         </ion-grid>
       </section>
-
     </div>
   </ion-content>
 
