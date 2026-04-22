@@ -6,7 +6,6 @@ import { TicketCount } from '../models/dashboard-home/ticket-count.interface';
 @Injectable({
   providedIn: 'root',
 })
-
 export class DashboardService {
   private readonly prefix = 'ticket';
 
@@ -15,6 +14,6 @@ export class DashboardService {
   private readonly http: HttpClient = inject(HttpClient);
 
   countTicketsByStatus(): Observable<TicketCount> {
-    return this.http.get<TicketCount>(`${this.apiUrl}/${this.prefix}/summary`)
+    return this.http.get<TicketCount>(`${this.apiUrl}/${this.prefix}/summary`);
   }
 }

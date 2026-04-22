@@ -1,4 +1,3 @@
-
 export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
 export interface TicketRequest {
