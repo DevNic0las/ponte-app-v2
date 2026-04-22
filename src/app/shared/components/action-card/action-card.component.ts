@@ -1,11 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { IonIcon, IonRippleEffect } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import {
-  ticketOutline,
-  addCircleOutline,
-  personOutline,
-} from 'ionicons/icons';
+import { ticketOutline, addCircleOutline, personOutline } from 'ionicons/icons';
 import { ActionCard } from '../../models/action-card.model';
 
 @Component({

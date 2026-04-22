@@ -1,4 +1,3 @@
-
 export interface TicketCard {
   icon: string;
   title: string;

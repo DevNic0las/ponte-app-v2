@@ -8,7 +8,6 @@ export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   providedIn: 'root',
 })
 export class DashboardService {
-
   private readonly apiUrl = environment.apiUrl;
   private http: HttpClient = inject(HttpClient);
 
@@ -25,10 +24,7 @@ export class DashboardService {
   }
 
   updateTicket(id: string, payload: TicketRequest): Observable<TicketResponse> {
-    return this.http.put<TicketResponse>(
-      `${this.apiUrl}/tickets/${id}`,
-      payload,
-    );
+    return this.http.put<TicketResponse>(`${this.apiUrl}/tickets/${id}`, payload);
   }
 
   deleteTicket(id: string): Observable<TicketResponse> {
@@ -36,17 +32,11 @@ export class DashboardService {
   }
 
   assignTicket(id: string): Observable<TicketResponse> {
-    return this.http.patch<TicketResponse>(
-      `${this.apiUrl}/tickets/${id}/assign`,
-      null,
-    );
+    return this.http.patch<TicketResponse>(`${this.apiUrl}/tickets/${id}/assign`, null);
   }
 
   closeTicket(id: string): Observable<TicketResponse> {
-    return this.http.patch<TicketResponse>(
-      `${this.apiUrl}/tickets/${id}/close`,
-      null,
-    );
+    return this.http.patch<TicketResponse>(`${this.apiUrl}/tickets/${id}/close`, null);
   }
 
   listDeletedTickets(): Observable<TicketResponse[]> {
@@ -54,8 +44,6 @@ export class DashboardService {
   }
 
   findDeletedTicketById(id: string): Observable<TicketResponse> {
-    return this.http.get<TicketResponse>(
-      `${this.apiUrl}/tickets/deleted/${id}`,
-    );
+    return this.http.get<TicketResponse>(`${this.apiUrl}/tickets/deleted/${id}`);
   }
 }
