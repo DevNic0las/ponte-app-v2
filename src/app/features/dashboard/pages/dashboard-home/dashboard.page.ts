@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
@@ -13,7 +13,6 @@ import { BottomNavComponent } from '../../../../shared/components/bottom-nav/bot
 import { ActionCard } from '../../../../shared/models/action-card.model';
 import { TicketCard } from '../../../../shared/models/ticket-card.model';
 import { DashboardService } from '../../services/dashboard-service';
-import { TicketCount } from '../../models/dashboard-home/ticket-count.interface';
 
 @Component({
   selector: 'app-dashboard',
