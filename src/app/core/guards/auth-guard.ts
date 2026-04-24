@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
-import { CanActivateFn } from '@angular/router';
-import { Router } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
+import { TokenStorageService } from '../storage/token-storage.service';
 
 interface JwtClaims {
   sub: string;
@@ -9,12 +9,14 @@ interface JwtClaims {
   exp: number;
 }
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = async () => {
   const router = inject(Router);
-  const token = localStorage.getItem('access_token');
-  const x = 1;
+  const tokenStorage = inject(TokenStorageService);
+
+  const token = await tokenStorage.getToken();
+
   if (!token) {
-    router.navigate(['/login']);
+    router.navigate(['auth']);
     return false;
   }
 
@@ -22,27 +24,23 @@ export const authGuard: CanActivateFn = (route, state) => {
     const claims = jwtDecode<JwtClaims>(token);
 
     if (!claims.exp || !claims.role) {
-      throw new Error('Invalid token');
-    }
-
-    const expired = claims.exp * 1000 < Date.now();
-
-    if (expired) {
-      localStorage.removeItem('access_token');
-      router.navigate(['/login']);
-
+      await tokenStorage.removeToken();
+      router.navigate(['auth']);
       return false;
     }
 
-    if (claims.role !== 'ADMIN') {
-      router.navigate(['/home']);
+    const isExpired = claims.exp * 1000 < Date.now();
+
+    if (isExpired) {
+      await tokenStorage.removeToken();
+      router.navigate(['auth']);
       return false;
     }
 
     return true;
   } catch {
-    localStorage.removeItem('access_token');
-    router.navigate(['/login']);
+    await tokenStorage.removeToken();
+    router.navigate(['auth']);
     return false;
   }
 };
