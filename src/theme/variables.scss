@@ -1,14 +1,19 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
 :root {
-  --color-primary: #6b00cc;
-  --color-on-primary: #ffffff;
+  --color-primary:        #6b00cc;
+  --color-on-primary:     #ffffff;
   --color-primary-subtle: #f4ebff;
-
-  --color-surface: #f9f9f9;
-  --color-background: #f9f9f9;
-  --color-on-surface: #1a1c1c;
-
-  --color-border-subtle: #e4e4e7;
-  --color-text-muted: #a1a1aa;
+  --color-surface:        #ffffff;   // branco para todas as páginas
+  --color-background:     #ffffff;   // branco para todas as páginas
+  --color-on-surface:     #1a1c1c;
+  --color-border-subtle:  #e4e4e7;
+  --color-text-muted:     #a1a1aa;
+ 
+  // Variáveis extras usadas nos componentes
+  --color-primary-container: #6b00cc;
+  --color-on-surface-var:    #4b4455;
+  --color-placeholder:       #888888;
+  --color-surface-low:       #ebebeb;
+  --radius-md:               12px;
+  --radius-full:             9999px;
 }
+ 
