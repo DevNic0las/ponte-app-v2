@@ -1,0 +1,100 @@
+<ion-content [fullscreen]="true" class="login-content">
+  <div class="login-wrapper">
+    <main class="login-main">
+      <div class="login-container">
+        <!-- Logo -->
+        <div class="logo-area">
+          <img src="./../../../../assets/icon/icon.png" alt="Ponte Logo" class="logo-img" />
+        </div>
+
+        <!-- Título -->
+        <div class="title-area">
+          <h1 class="login-title">login</h1>
+          <p class="login-subtitle">Acesse sua conta corporativa</p>
+        </div>
+
+        <!-- Formulário -->
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+          <!-- E-mail -->
+          <div class="field-group">
+            <label class="field-label" for="email">E-mail</label>
+            <div class="input-wrapper">
+              <input
+                id="email"
+                type="email"
+                formControlName="email"
+                placeholder="nome@empresa.com.br"
+                class="field-input"
+                [class.input-error]="isFieldInvalid('email')"
+                autocomplete="email"
+              />
+            </div>
+            <span class="error-msg" *ngIf="isFieldInvalid('email')">
+              Informe um e-mail válido.
+            </span>
+          </div>
+
+          <!-- Senha -->
+          <div class="field-group">
+            <label class="field-label" for="password">Senha</label>
+            <div class="input-wrapper input-password-wrapper">
+              <input
+                id="password"
+                [type]="showPassword ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="••••••••"
+                class="field-input"
+                [class.input-error]="isFieldInvalid('password')"
+                autocomplete="current-password"
+              />
+              <button
+                type="button"
+                class="toggle-password"
+                (click)="togglePassword()"
+                aria-label="Mostrar ou ocultar senha"
+              >
+                <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+              </button>
+            </div>
+            <span class="error-msg" *ngIf="isFieldInvalid('password')"> Informe sua senha. </span>
+          </div>
+
+          <!-- Esqueceu a senha -->
+          <div class="forgot-area">
+            <a class="forgot-link" (click)="onForgotPassword()">Esqueceu a senha?</a>
+          </div>
+
+          <!-- Botão Entrar -->
+          <button
+            type="submit"
+            class="btn-login"
+            [class.btn-loading]="isLoading"
+            [disabled]="isLoading"
+          >
+            <ion-spinner *ngIf="isLoading" name="crescent" class="btn-spinner"></ion-spinner>
+            <span *ngIf="!isLoading">Entrar</span>
+          </button>
+
+          <!-- Mensagem de erro geral -->
+          <div class="general-error" *ngIf="errorMessage">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            <span>{{ errorMessage }}</span>
+          </div>
+        </form>
+
+        <!-- Solicitar acesso -->
+        <div class="signup-area">
+          <p class="signup-text">
+            Não tem uma conta?
+            <a class="signup-link" (click)="onRequestAccess()">Solicite acesso</a>
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="login-footer">
+      <p class="footer-text">PONTE, A SOLUÇÃO ESTÁ DO OUTRO LADO © 2026</p>
+    </footer>
+  </div>
+</ion-content>

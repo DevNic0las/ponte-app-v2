@@ -1,0 +1,301 @@
+// === VARIÁVEIS ===
+:host {
+  --color-primary: #6b00cc;
+  --color-primary-shadow: rgba(107, 0, 204, 0.2);
+  --color-surface-low: #f3f3f3;
+  --color-surface-lowest: #ffffff;
+  --color-on-surface: #1a1c1c;
+  --color-on-surface-variant: #4b4455;
+  --color-outline: #7d7386;
+  --color-outline-faint: rgba(125, 115, 134, 0.4);
+  --color-outline-soft: rgba(125, 115, 134, 0.6);
+  --color-error: #ba1a1a;
+  --color-error-bg: #ffdad6;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --font-main: 'Inter', sans-serif;
+}
+
+// === CONTENT ===
+ion-content.login-content {
+  --background: var(--color-surface-lowest);
+}
+
+.login-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: var(--color-surface-lowest);
+}
+
+// === MAIN ===
+.login-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px 32px;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 384px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+// === LOGO ===
+.logo-area {
+  margin-bottom: 40px;
+
+  .logo-img {
+    height: 96px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+  }
+}
+
+// === TÍTULO ===
+.title-area {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 32px;
+
+  .login-title {
+    font-family: var(--font-main);
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    text-transform: lowercase;
+    color: var(--color-on-surface);
+    margin: 0;
+  }
+
+  .login-subtitle {
+    font-family: var(--font-main);
+    font-size: 14px;
+    color: var(--color-on-surface-variant);
+    margin: 8px 0 0;
+  }
+}
+
+// === FORM ===
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+// === CAMPO ===
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .field-label {
+    font-family: var(--font-main);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-outline);
+    margin-left: 4px;
+  }
+
+  .input-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .field-input {
+    width: 100%;
+    background: var(--color-surface-low);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 16px;
+    font-family: var(--font-main);
+    font-size: 15px;
+    color: var(--color-on-surface);
+    outline: none;
+    box-sizing: border-box;
+    transition: box-shadow 0.15s ease;
+    appearance: none;
+    -webkit-appearance: none;
+
+    &::placeholder {
+      color: var(--color-outline-soft);
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 2px var(--color-primary);
+    }
+
+    &.input-error {
+      box-shadow: 0 0 0 2px var(--color-error);
+    }
+  }
+
+  &.input-password-wrapper .field-input {
+    padding-right: 48px;
+  }
+
+  .error-msg {
+    font-family: var(--font-main);
+    font-size: 12px;
+    color: var(--color-error);
+    margin-left: 4px;
+  }
+}
+
+// === TOGGLE SENHA ===
+.toggle-password {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-outline-soft);
+  display: flex;
+  align-items: center;
+  transition: color 0.15s ease;
+
+  ion-icon {
+    font-size: 20px;
+  }
+
+  &:hover {
+    color: var(--color-primary);
+  }
+}
+
+// === ESQUECEU SENHA ===
+.forgot-area {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -12px;
+
+  .forgot-link {
+    font-family: var(--font-main);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+    text-decoration: none;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+// === BOTÃO LOGIN ===
+.btn-login {
+  width: 100%;
+  background: var(--color-primary);
+  color: #ffffff;
+  font-family: var(--font-main);
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  cursor: pointer;
+  box-shadow:
+    0 10px 15px -3px var(--color-primary-shadow),
+    0 4px 6px -4px var(--color-primary-shadow);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 54px;
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled,
+  &.btn-loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  .btn-spinner {
+    --color: #ffffff;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// === ERRO GERAL ===
+.general-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-error-bg);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font-family: var(--font-main);
+  font-size: 13px;
+  color: var(--color-error);
+
+  ion-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+}
+
+// === SOLICITAR ACESSO ===
+.signup-area {
+  margin-top: 48px;
+  text-align: center;
+
+  .signup-text {
+    font-family: var(--font-main);
+    font-size: 13px;
+    color: var(--color-on-surface-variant);
+    margin: 0;
+  }
+
+  .signup-link {
+    font-weight: 700;
+    color: var(--color-primary);
+    cursor: pointer;
+    text-decoration: none;
+    transition: text-decoration 0.1s;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// === FOOTER ===
+.login-footer {
+  padding: 24px;
+  text-align: center;
+
+  .footer-text {
+    font-family: var(--font-main);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--color-outline-faint);
+    margin: 0;
+  }
+}
