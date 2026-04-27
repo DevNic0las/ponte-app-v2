@@ -1,11 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon, IonSpinner } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { eyeOutline, eyeOffOutline, alertCircleOutline } from 'ionicons/icons';
-
+import { AuthService } from '../services/auth.service';
+import { TokenStorageService } from 'src/app/core/storage/token-storage.service';
+import { firstValueFrom } from 'rxjs';
+import { jwtDecode } from 'jwt-decode';
 // Caso queira integrar um AuthService real, descomente e injete abaixo.
 // import { AuthService } from 'src/app/services/auth.service';
 
@@ -22,33 +25,30 @@ export class LoginPage implements OnInit {
   isLoading = false;
   errorMessage = '';
 
-  constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    // private authService: AuthService, // descomente quando tiver o serviço
-  ) {
+  private readonly fb: FormBuilder = inject(FormBuilder);
+  private readonly router: Router = inject(Router);
+  private readonly authService = inject(AuthService);
+  private readonly tokenStorageService = inject(TokenStorageService);
+  constructor() {
     addIcons({ eyeOutline, eyeOffOutline, alertCircleOutline });
   }
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required]],
     });
   }
 
-  // Verifica se o campo foi tocado e é inválido
   isFieldInvalid(field: string): boolean {
     const control = this.loginForm.get(field);
     return !!(control && control.invalid && (control.dirty || control.touched));
   }
 
-  // Alterna visibilidade da senha
   togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
 
-  // Submissão do formulário
   async onSubmit(): Promise<void> {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
@@ -61,38 +61,27 @@ export class LoginPage implements OnInit {
     const { email, password } = this.loginForm.value;
 
     try {
-      // ---- Substitua este bloco pela chamada real ao seu AuthService ----
-      await this.simulateLogin(email, password);
-      // -------------------------------------------------------------------
+      const response$ = await firstValueFrom(this.authService.login({ email, password }));
 
-      // Redireciona após login bem-sucedido
-      await this.router.navigateByUrl('/home', { replaceUrl: true });
-    } catch (error: any) {
-      this.errorMessage = error?.message ?? 'Erro ao realizar login. Tente novamente.';
+      await this.tokenStorageService.saveToken(response$.token);
+
+      const decodedToken = jwtDecode(response$.token) as { role?: string };
+
+      if (decodedToken.role === 'REQUESTER') {
+        await this.router.navigateByUrl('/home', { replaceUrl: true });
+      } else {
+        await this.router.navigateByUrl('/dashboard', { replaceUrl: true });
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
     } finally {
       this.isLoading = false;
     }
   }
 
-  // Simulação de login — REMOVA ao integrar o AuthService real
-  private simulateLogin(email: string, password: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (email && password) {
-          resolve();
-        } else {
-          reject({ message: 'Credenciais inválidas.' });
-        }
-      }, 1500);
-    });
-  }
-
-  // Navega para recuperação de senha
   onForgotPassword(): void {
     this.router.navigateByUrl('/forgot-password');
   }
-
-  // Navega para solicitação de acesso
   onRequestAccess(): void {
     this.router.navigateByUrl('/request-access');
   }
