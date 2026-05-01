@@ -2,12 +2,12 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { TicketRequest, TicketResponse } from '../models/ticket.model';
+import { Category, Subcategory, TicketRequest, TicketResponse } from '../models/ticket.model';
 export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 @Injectable({
   providedIn: 'root',
 })
-export class DashboardService {
+export class TicketService {
   private readonly apiUrl = environment.apiUrl;
   private http: HttpClient = inject(HttpClient);
 
@@ -45,5 +45,11 @@ export class DashboardService {
 
   findDeletedTicketById(id: string): Observable<TicketResponse> {
     return this.http.get<TicketResponse>(`${this.apiUrl}/tickets/deleted/${id}`);
+  }
+  getCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>(`${this.apiUrl}/category`);
+  }
+  getSubcategories(subcategoryPublicId: string): Observable<Subcategory[]> {
+    return this.http.get<Subcategory[]>(`${this.apiUrl}/subcategory/${subcategoryPublicId}`);
   }
 }
