@@ -38,7 +38,6 @@
           interface="action-sheet"
           placeholder="Selecione o departamento"
           class="custom-select"
-          (ngModelChange)="onDepartamentoChange($event)"
         >
           <ion-select-option *ngFor="let d of categories$ | async" [value]="d.publicId">
             {{ d.name }}
@@ -68,7 +67,7 @@
           placeholder="Selecione o item"
           class="custom-select"
           [disabled]="!(subcategories$ | async)"
-          (ngModelChange)="onSubcategoryChange($event)"
+         
         >
           <ion-select-option *ngFor="let i of subcategories$ | async" [value]="i.publicId">
             {{ i.name }}

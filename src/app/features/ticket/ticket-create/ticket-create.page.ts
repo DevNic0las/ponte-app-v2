@@ -32,7 +32,7 @@ import {
 import { Category, Subcategory, TicketRequest } from '../models/ticket.model';
 import { environment } from 'src/environments/environment';
 import { TicketService } from '../services/ticket.service';
-import { Observable, Subject, switchMap, tap } from 'rxjs';
+import { firstValueFrom, Observable, Subject, switchMap, tap } from 'rxjs';
 import { ToastService } from 'src/app/shared/services/toast';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 @Component({
@@ -87,6 +87,7 @@ export class TicketCreatePage implements OnInit {
     categoryId: ['', Validators.required], // só UI
     subcategoryId: ['', Validators.required],
     sector: ['', Validators.required],
+    peripheral: [''], // só UI
   });
   isLoading = false;
 
@@ -175,7 +176,7 @@ export class TicketCreatePage implements OnInit {
 
     try {
       this.isLoading = true;
-      this.ticketService$.createTicket(payload);
+      await firstValueFrom(this.ticketService$.createTicket(payload));
       this.toastService$.success('Chamado criado com sucesso');
       // this.navCtrl.back();
     } catch (error) {
