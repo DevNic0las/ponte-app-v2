@@ -6,7 +6,7 @@ export const DASHBOARD_ROUTES: Routes = [
     component: DashboardHomePage,
   },
   {
-    path: 'new',
+    path: 'ticket-create',
     loadComponent: () =>
       import('../dashboard/pages/ticket-create/ticket-create.page').then((m) => m.TicketCreatePage),
   },

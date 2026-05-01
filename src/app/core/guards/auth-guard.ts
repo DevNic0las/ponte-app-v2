@@ -1,15 +1,15 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn, Router, ActivatedRouteSnapshot } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
 import { TokenStorageService } from '../storage/token-storage.service';
 
 interface JwtClaims {
   sub: string;
-  role: string;
+  role: '' | 'REQUESTER' | 'TECHNICIAN';
   exp: number;
 }
 
-export const authGuard: CanActivateFn = async () => {
+export const authGuard: CanActivateFn = async (route: ActivatedRouteSnapshot) => {
   const router = inject(Router);
   const tokenStorage = inject(TokenStorageService);
 
@@ -34,6 +34,15 @@ export const authGuard: CanActivateFn = async () => {
     if (isExpired) {
       await tokenStorage.removeToken();
       router.navigate(['auth']);
+      return false;
+    }
+
+    const requiredRoles = route.data?.['roles'];
+
+    if (!requiredRoles) return true;
+
+    if (!requiredRoles.includes(claims.role)) {
+      router.navigate(['home']);
       return false;
     }
 
