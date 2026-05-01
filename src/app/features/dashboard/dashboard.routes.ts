@@ -8,6 +8,6 @@ export const DASHBOARD_ROUTES: Routes = [
   {
     path: 'ticket-create',
     loadComponent: () =>
-      import('../dashboard/pages/ticket-create/ticket-create.page').then((m) => m.TicketCreatePage),
+      import('../ticket/ticket-create/ticket-create.page').then((m) => m.TicketCreatePage),
   },
 ];

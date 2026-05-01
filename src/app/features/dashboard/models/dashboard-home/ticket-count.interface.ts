@@ -3,4 +3,5 @@ export interface TicketCount {
   inProgress: number;
   pending: number;
   closed: number;
+  resolved: number;
 }
