@@ -14,7 +14,7 @@ export const routes: Routes = [
   },
   {
     path: 'auth',
-    loadComponent: () => import('./features/auth/auth.page').then((m) => m.AuthPage),
+    loadComponent: () => import('./features/auth/pages/auth.page').then((m) => m.LoginPage),
   },
   {
     path: 'profile',
@@ -26,5 +26,6 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./features/dashboard/dashboard.routes').then((m) => m.DASHBOARD_ROUTES),
     canActivate: [authGuard],
+    data: { roles: ['TECHNICIAN'] },
   },
 ];
