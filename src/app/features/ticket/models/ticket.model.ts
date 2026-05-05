@@ -3,8 +3,7 @@ export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 export interface TicketRequest {
   title: string;
   description: string;
-  subcategoryId: string;
-  priority: string;
+  subcategory: string;
   sector: string;
 }
 
@@ -29,4 +28,9 @@ export interface Subcategory {
   publicId: string;
   name: string;
   hasPeripheral: boolean;
+}
+
+export interface Sector {
+  name: string;
+  publicId: string;
 }
