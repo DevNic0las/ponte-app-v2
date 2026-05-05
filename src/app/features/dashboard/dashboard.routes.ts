@@ -10,6 +10,6 @@ export const DASHBOARD_ROUTES: Routes = [
     path: 'ticket-create',
     loadComponent: () =>
       import('../ticket/ticket-create/ticket-create.page').then((m) => m.TicketCreatePage),
-      canActivateChild: [authGuard],
+    canActivateChild: [authGuard],
   },
 ];
