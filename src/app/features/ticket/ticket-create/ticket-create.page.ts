@@ -29,7 +29,7 @@ import {
   barChartOutline,
   personOutline,
 } from 'ionicons/icons';
-import { Category, Subcategory, TicketRequest } from '../models/ticket.model';
+import { Category, Sector, Subcategory, TicketRequest } from '../models/ticket.model';
 import { environment } from 'src/environments/environment';
 import { TicketService } from '../services/ticket.service';
 import { firstValueFrom, Observable, Subject, switchMap, tap } from 'rxjs';
@@ -65,6 +65,9 @@ import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 })
 export class TicketCreatePage implements OnInit {
   private readonly apiUrl = environment.apiUrl;
+  private readonly ticketService$ = inject(TicketService);
+  private readonly navCtrl = inject(NavController);
+  private readonly toastService$ = inject(ToastService);
 
   categories$!: Observable<Category[]>;
 
@@ -72,10 +75,13 @@ export class TicketCreatePage implements OnInit {
 
   subcategories: Subcategory[] = []; // lista local pra consultar
 
+  sectors: Sector[] = []; // lista local pra consultar
+
   subcategories$ = this.categoryChange$.pipe(
     switchMap((categoryId) => this.ticketService$.getSubcategories(categoryId)),
     tap((subs) => (this.subcategories = subs)), // guarda localmente
   );
+  sectors$ = this.ticketService$.getSectors().pipe(tap((sectors) => (this.sectors = sectors)));
   peripheral: string[] = ['Mouse', 'Teclado', 'Monitor', 'Impressora', 'Outro'];
 
   private readonly fb = inject(FormBuilder);
@@ -83,11 +89,9 @@ export class TicketCreatePage implements OnInit {
   form = this.fb.nonNullable.group({
     title: ['', Validators.required],
     description: ['', Validators.required],
-    priority: ['MEDIUM', Validators.required],
-    categoryId: ['', Validators.required], // só UI
-    subcategoryId: ['', Validators.required],
+    subcategory: ['', Validators.required],
     sector: ['', Validators.required],
-    peripheral: [''], // só UI
+    category: ['', Validators.required],
   });
   isLoading = false;
 
@@ -100,9 +104,6 @@ export class TicketCreatePage implements OnInit {
   // ----------------------------------------------------------------
   // Injeção de dependências
   // ----------------------------------------------------------------
-  private readonly navCtrl = inject(NavController);
-  private readonly ticketService$ = inject(TicketService);
-  private readonly toastService$ = inject(ToastService);
 
   constructor() {
     addIcons({
@@ -118,12 +119,12 @@ export class TicketCreatePage implements OnInit {
   ngOnInit(): void {
     this.categories$ = this.ticketService$.getCategories();
 
-    this.form.get('categoryId')!.valueChanges.subscribe((categoryId) => {
-      this.form.get('subcategoryId')!.setValue('');
+    this.form.get('category')!.valueChanges.subscribe((categoryId) => {
+      this.form.get('subcategory')!.setValue('');
       this.categoryChange$.next(categoryId);
     });
 
-    this.form.get('subcategoryId')!.valueChanges.subscribe((id) => {
+    this.form.get('subcategory')!.valueChanges.subscribe((id) => {
       if (id) this.onSubcategoryChange(id);
     });
   }
@@ -139,7 +140,7 @@ export class TicketCreatePage implements OnInit {
    */
 
   onDepartamentoChange(categoryId: string): void {
-    this.form.get('subcategoryId')?.setValue('');
+    this.form.get('subcategory')?.setValue('');
     this.categoryChange$.next(categoryId);
   }
 
@@ -172,7 +173,8 @@ export class TicketCreatePage implements OnInit {
       return;
     }
 
-    const payload: TicketRequest = this.form.getRawValue();
+    const { title, description, sector, subcategory } = this.form.getRawValue();
+    const payload: TicketRequest = { title, description, sector, subcategory };
 
     try {
       this.isLoading = true;

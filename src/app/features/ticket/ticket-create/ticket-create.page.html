@@ -16,16 +16,13 @@
       <h2 class="section-title">RELATAR UM PROBLEMA</h2>
     </div>
 
-    <form  [formGroup]="form" (ngSubmit)="onSubmit()" class="ticket-form">
-
-
-
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="ticket-form">
       <div class="field-group">
         <label class="field-label">Titulo do chamado</label>
         <ion-input
           formControlName="title"
           type="text"
-           interface="action-sheet"
+          interface="action-sheet"
           placeholder="Digite o título do chamado"
           class="custom-input"
         ></ion-input>
@@ -34,7 +31,7 @@
       <div class="field-group">
         <label class="field-label">Departamento de TI</label>
         <ion-select
-          formControlName="categoryId"
+          formControlName="category"
           interface="action-sheet"
           placeholder="Selecione o departamento"
           class="custom-select"
@@ -58,16 +55,14 @@
         </div>
       </div> -->
 
-
       <div class="field-group">
         <label class="field-label">item</label>
         <ion-select
-          formControlName="subcategoryId"
+          formControlName="subcategory"
           interface="action-sheet"
           placeholder="Selecione o item"
           class="custom-select"
           [disabled]="!(subcategories$ | async)"
-         
         >
           <ion-select-option *ngFor="let i of subcategories$ | async" [value]="i.publicId">
             {{ i.name }}
@@ -99,10 +94,9 @@
             placeholder="Selecione o setor"
             class="custom-select"
           >
-            <ion-select-option value="RH">RH</ion-select-option>
-            <ion-select-option value="Financeiro">Financeiro</ion-select-option>
-            <ion-select-option value="TI">TI</ion-select-option>
-            <ion-select-option value="Operacional">Operacional</ion-select-option>
+            <ion-select-option *ngFor="let p of sectors$ | async" [value]="p.publicId"
+              >{{ p.name }}</ion-select-option
+            >
           </ion-select>
           <ion-icon name="chevron-down-outline" class="select-chevron"></ion-icon>
         </div>
