@@ -9,7 +9,8 @@ export const routes: Routes = [
   {
     path: 'home',
     loadComponent: () =>
-      import('./features/home/home.page').then(m => m.HomePage)
+      // Alterado de m.HomePage para m.UserMenuPage
+      import('./features/home/user.menu.page').then(m => m.UserMenuPage)
   },
   {
     path: 'auth',
