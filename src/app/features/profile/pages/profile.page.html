@@ -9,20 +9,19 @@
     <ion-title class="ponte-logo">Ponte</ion-title>
 
     <ion-buttons slot="end">
-      <ion-avatar class="header-avatar">
+      <!-- <ion-avatar class="header-avatar">
         <img [src]="headerAvatar" alt="User profile" />
-      </ion-avatar>
+      </ion-avatar> -->
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="profile-content">
-
+<ion-content [fullscreen]="true" class="profile-content" *ngIf="profile$ | async as profile">
   <!-- Hero / Profile Header -->
   <div class="profile-hero">
     <div class="avatar-wrapper">
       <ion-avatar class="profile-avatar">
-        <img [src]="user.avatar" [alt]="user.name" />
+        <img [src]="profile.avatar || 'https://via.placeholder.com/150'" [alt]="profile.name" />
       </ion-avatar>
       <button class="edit-fab ion-activatable" (click)="onEditProfile()">
         <ion-ripple-effect></ion-ripple-effect>
@@ -32,9 +31,9 @@
 
     <div class="profile-info">
       <span class="role-badge">Colaborador</span>
-      <h1 class="profile-name">{{ user.name }}</h1>
-      <p class="profile-department">{{ user.department }}</p>
-      <p class="profile-role">{{ user.role }}</p>
+      <h1 class="profile-name">{{ profile.name }}</h1>
+      <p class="profile-department">{{ profile.sector }}</p>
+      <p class="profile-role">{{ profile.role }}</p>
     </div>
   </div>
 
@@ -49,7 +48,7 @@
         </div>
         <ion-label>
           <p class="info-label">E-mail Corporativo</p>
-          <h3 class="info-value">{{ user.email }}</h3>
+          <h3 class="info-value">{{ profile.email }}</h3>
         </ion-label>
       </ion-item>
 
@@ -59,7 +58,7 @@
         </div>
         <ion-label>
           <p class="info-label">ID do Funcionário</p>
-          <h3 class="info-value">{{ user.employeeId }}</h3>
+          <h3 class="info-value">{{ profile.publicId }}</h3>
         </ion-label>
       </ion-item>
     </ion-card-content>
@@ -90,7 +89,13 @@
 
       <div class="divider"></div>
 
-      <ion-item button detail="false" lines="none" class="pref-item logout-item" (click)="onLogout()">
+      <ion-item
+        button
+        detail="false"
+        lines="none"
+        class="pref-item logout-item"
+        (click)="onLogout()"
+      >
         <div class="info-icon-wrap logout-icon-wrap" slot="start">
           <ion-icon name="log-out-outline"></ion-icon>
         </div>
@@ -98,28 +103,6 @@
       </ion-item>
     </ion-card-content>
   </ion-card>
-
 </ion-content>
 
-<!-- Bottom Tab Bar -->
-<ion-tab-bar slot="bottom" class="ponte-tabbar">
-  <ion-tab-button tab="home" href="/home" class="tab-btn">
-    <ion-icon name="home-outline"></ion-icon>
-    <ion-label>Home</ion-label>
-  </ion-tab-button>
-
-  <ion-tab-button tab="atendimento" href="/atendimento" class="tab-btn">
-    <ion-icon name="ticket-outline"></ion-icon>
-    <ion-label>Atendimento</ion-label>
-  </ion-tab-button>
-
-  <ion-tab-button tab="relatorios" href="/relatorios" class="tab-btn">
-    <ion-icon name="bar-chart-outline"></ion-icon>
-    <ion-label>Relatórios</ion-label>
-  </ion-tab-button>
-
-  <ion-tab-button tab="perfil" href="/perfil" class="tab-btn tab-active">
-    <ion-icon name="person-outline"></ion-icon>
-    <ion-label>Perfil</ion-label>
-  </ion-tab-button>
-</ion-tab-bar>
+<app-bottom-nav></app-bottom-nav>

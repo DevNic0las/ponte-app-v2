@@ -16,9 +16,6 @@ import {
   IonInput,
   IonTextarea,
   IonSpinner,
-  IonTabBar,
-  IonTabButton,
-  IonLabel,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -55,9 +52,6 @@ import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
     IonInput,
     IonTextarea,
     IonSpinner,
-    IonTabBar,
-    IonTabButton,
-    IonLabel,
     BottomNavComponent,
     CommonModule,
     ReactiveFormsModule,

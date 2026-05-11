@@ -2,19 +2,19 @@
 // Design Tokens (mirror do Tailwind config original)
 // ──────────────────────────────────────────────
 :root {
-  --color-primary:           #4d0096;
+  --color-primary: #4d0096;
   --color-primary-container: #6b00cc;
-  --color-on-primary:        #ffffff;
-  --color-secondary:         #7640bd;
-  --color-surface:           #f9f9f9;
+  --color-on-primary: #ffffff;
+  --color-secondary: #7640bd;
+  --color-surface: #f9f9f9;
   --color-surface-container: #eeeeee;
-  --color-surface-low:       #f3f3f3;
-  --color-on-surface:        #1a1c1c;
-  --color-on-surface-var:    #4b4455;
-  --color-outline:           #7d7386;
-  --color-error:             #ba1a1a;
-  --radius-xl:               0.75rem;
-  --radius-full:             9999px;
+  --color-surface-low: #f3f3f3;
+  --color-on-surface: #1a1c1c;
+  --color-on-surface-var: #4b4455;
+  --color-outline: #7d7386;
+  --color-error: #ba1a1a;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
 }
 
 // ──────────────────────────────────────────────
@@ -125,7 +125,7 @@
 .profile-name {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--color-on-surface);
+  color: #000 !important;
   margin: 0;
   line-height: 1.2;
 }
@@ -133,13 +133,13 @@
 .profile-department {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--color-on-surface-var);
+  color: #333 !important;
   margin: 8px 0 0;
 }
 
 .profile-role {
   font-size: 0.875rem;
-  color: var(--color-outline);
+  color: #666 !important;
   margin: 2px 0 0;
 }
 
