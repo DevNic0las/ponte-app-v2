@@ -2,7 +2,13 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { Category, Sector, Subcategory, TicketRequest, TicketResponse } from '../models/ticket.model';
+import {
+  Category,
+  Sector,
+  Subcategory,
+  TicketRequest,
+  TicketResponse,
+} from '../models/ticket.model';
 export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 @Injectable({
   providedIn: 'root',

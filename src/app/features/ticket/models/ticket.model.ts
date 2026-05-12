@@ -1,5 +1,5 @@
 export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-
+export type TicketStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED' | 'PENDING';
 export interface TicketRequest {
   title: string;
   description: string;
@@ -13,10 +13,11 @@ export interface TicketResponse {
   description: string;
   priority: TicketPriority;
   subcategoryId: string;
-  status: string;
+  status: TicketStatus;
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
+  assignedTo?: string;
 }
 
 export interface Category {
@@ -34,3 +35,21 @@ export interface Sector {
   name: string;
   publicId: string;
 }
+
+export interface TicketStatusConfig {
+  label: string;
+  accentColor: string;
+  badgeCssClass: string;
+}
+
+export const TICKET_STATUS_CONFIG: Record<TicketStatus, TicketStatusConfig> = {
+  OPEN: { label: 'Novo Chamado', accentColor: '#10B981', badgeCssClass: 'badge--new' },
+  IN_PROGRESS: {
+    label: 'Em Atendimento',
+    accentColor: '#3B82F6',
+    badgeCssClass: 'badge--progress',
+  },
+  RESOLVED: { label: 'Resolvido', accentColor: '#22C55E', badgeCssClass: 'badge--resolved' },
+  PENDING: { label: 'Planejado', accentColor: '#F59E0B', badgeCssClass: 'badge--planned' },
+  CLOSED: { label: 'Encerrado', accentColor: '#6B7280', badgeCssClass: 'badge--closed' },
+};
