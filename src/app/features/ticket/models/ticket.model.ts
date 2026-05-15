@@ -6,7 +6,10 @@ export interface TicketRequest {
   subcategory: string;
   sector: string;
 }
-
+export interface RequestedBy {
+  name: string;
+  email: string;
+}
 export interface TicketResponse {
   publicId: string;
   title: string;
@@ -18,6 +21,7 @@ export interface TicketResponse {
   updatedAt: string;
   deletedAt?: string;
   assignedTo?: string;
+  requestedBy: RequestedBy;
 }
 
 export interface Category {

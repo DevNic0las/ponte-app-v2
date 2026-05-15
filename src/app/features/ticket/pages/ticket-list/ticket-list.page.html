@@ -1,61 +1,105 @@
-<!-- ticket-list.page.html -->
-
-<ion-header>
+<ion-header class="ticket-header">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button routerLink="/dashboard">
+      <ion-button routerLink="/dashboard" class="nav-icon-btn">
         <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-
-    <ion-title>Atendimento</ion-title>
-
+    <ion-title class="page-title">Atendimento</ion-title>
     <ion-buttons slot="end">
-      <ion-button>
+      <ion-button class="nav-icon-btn">
         <ion-icon slot="icon-only" name="search"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="ticket-list-page">
+<ion-content (click)="onContentClick($event)">
+  <div class="page-wrapper">
+
     <!-- Cabeçalho editorial -->
-    <div class="ticket-list-page__editorial">
-      <span class="ticket-list-page__eyebrow">VISÃO GERAL</span>
-      <h2 class="ticket-list-page__heading">Gerenciamento de Chamados</h2>
-      <p class="ticket-list-page__subheading">
+    <div class="editorial-header">
+      <span class="editorial-eyebrow">VISÃO GERAL</span>
+      <h2 class="editorial-heading">Gerenciamento de Chamados</h2>
+      <p class="editorial-subheading">
         Acompanhe e responda às solicitações ativas da plataforma.
       </p>
+
+      <!-- Filtro -->
+      <div class="filter-wrapper" #filterWrapper>
+        <button class="filter-btn" (click)="toggleDropdown($event)" [class.active]="isFilterOpen">
+          <ion-icon name="options-outline"></ion-icon>
+          <span class="filter-label">Filtrar</span>
+          @if (activeFilter !== 'all') {
+            <span class="filter-badge">1</span>
+          }
+          <ion-icon name="chevron-down-outline" [class.rotated]="isFilterOpen"></ion-icon>
+        </button>
+
+        <div class="filter-dropdown" [class.visible]="isFilterOpen">
+          <div class="dropdown-header">
+            <span class="dropdown-title">Filtrar por Status</span>
+          </div>
+
+          <div class="dropdown-options">
+            @for (option of filterOptions; track option.value) {
+              <button
+                class="dropdown-option"
+                [class.selected]="activeFilter === option.value"
+                (click)="setFilter(option.value)"
+              >
+                <span class="option-dot" [style.background]="option.color" [style.box-shadow]="'0 0 0 2px ' + option.ring"></span>
+                <span class="option-label">{{ option.label }}</span>
+                @if (activeFilter === option.value) {
+                  <ion-icon name="checkmark-outline" class="option-check"></ion-icon>
+                }
+              </button>
+            }
+          </div>
+
+          @if (activeFilter !== 'all') {
+            <div class="dropdown-footer">
+              <button class="dropdown-clear" (click)="setFilter('all')">Limpar Filtros</button>
+            </div>
+          }
+        </div>
+      </div>
     </div>
 
-    <!-- Estado: loading -->
+    <!-- Loading -->
     @if (isLoading()) {
-    <div class="ticket-list-page__center">
-      <ion-spinner name="crescent" color="primary"></ion-spinner>
-    </div>
+      <div class="state-center">
+        <ion-spinner name="crescent" color="primary"></ion-spinner>
+      </div>
     }
 
-    <!-- Estado: erro -->
+    <!-- Erro -->
     @if (error()) {
-    <div class="ticket-list-page__center ticket-list-page__center--error">
-      <ion-icon name="alert-circle-outline"></ion-icon>
-      <p>{{ error() }}</p>
-      <ion-button fill="outline" color="primary" (click)="loadTickets()">
-        Tentar novamente
-      </ion-button>
-    </div>
+      <div class="state-center state-center--error">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <p>{{ error() }}</p>
+        <ion-button fill="outline" color="primary" (click)="loadTickets()">
+          Tentar novamente
+        </ion-button>
+      </div>
     }
 
-    <!-- Lista de cards -->
+    <!-- Lista -->
     @if (!isLoading() && !error()) {
-    <div class="ticket-list-page__list">
-      @for (ticket of tickets(); track trackByTicketId($index, ticket)) {
-      <app-ticket-list-card [ticket]="ticket" (ticketClick)="onTicketSelected($event)" />
-      }
-    </div>
+      <div class="ticket-list">
+        @for (ticket of filteredTickets(); track trackByTicketId($index, ticket)) {
+          <app-ticket-list-card [ticket]="ticket" (ticketClick)="onTicketSelected($event)" />
+        }
+        @if (filteredTickets().length === 0) {
+          <div class="state-empty">
+            <ion-icon name="folder-open-outline"></ion-icon>
+            <p>Nenhum chamado para este filtro.</p>
+          </div>
+        }
+      </div>
     }
+
   </div>
 </ion-content>
 
- <app-bottom-nav></app-bottom-nav> 
+<app-bottom-nav></app-bottom-nav>

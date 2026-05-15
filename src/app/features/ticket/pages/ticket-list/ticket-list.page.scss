@@ -1,62 +1,259 @@
-// ticket-list.page.scss
-
-ion-content {
-  // Usa --color-surface-low que você já tem definido (#ebebeb)
-  // Isso cria o contraste necessário para os cards brancos aparecerem
-  --background: var(--color-surface-low);
+// ── Toolbar ─────────────────────────────────────────────────────────────────
+.ticket-header {
+  ion-toolbar {
+    --background: var(--color-surface);
+    --border-color: var(--color-border-subtle);
+    --border-width: 0 0 1px 0;
+    --padding-start: 8px;
+    --padding-end: 8px;
+  }
 }
-.ticket-list-page {
-    padding: 24px 16px 32px;
+
+.page-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.nav-icon-btn {
+  --color: var(--color-primary);
+}
+
+// ── Page Wrapper ─────────────────────────────────────────────────────────────
+ion-content {
+  --background: var(--color-background);
+}
+
+.page-wrapper {
   max-width: 640px;
   margin: 0 auto;
+  padding: 32px 20px 24px;
+}
 
-  &__editorial {
-    margin-bottom: 28px;
-  }
+// ── Editorial Header ─────────────────────────────────────────────────────────
+.editorial-header {
+  margin-bottom: 28px;
+}
 
-  &__eyebrow {
-    display: block;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-primary, #4d0096);
-    margin-bottom: 6px;
-  }
+.editorial-eyebrow {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 6px;
+}
 
-  &__heading {
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--color-on-surface, #1a1c1c);
-    margin: 0 0 8px;
-    line-height: 1.2;
-  }
+.editorial-heading {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-on-surface);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0 0 8px;
+}
 
-  &__subheading {
-    font-size: 13px;
-    color: var(--color-on-surface-variant, #4b4455);
-    margin: 0;
-    line-height: 1.5;
-  }
+.editorial-subheading {
+  font-size: 14px;
+  color: var(--color-on-surface-var);
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
 
-  &__list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
+// ── Filter Wrapper ────────────────────────────────────────────────────────────
+.filter-wrapper {
+  position: relative;
+  display: inline-block;
+}
 
-  &__center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 48px 0;
-    gap: 12px;
-    color: var(--color-on-surface-variant, #4b4455);
+.filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  color: var(--color-primary);
+  transition: background 0.2s, box-shadow 0.2s;
 
-    &--error {
-      text-align: center;
-      font-size: 14px;
+  ion-icon {
+    font-size: 18px;
+
+    &[name="chevron-down-outline"] {
+      font-size: 16px;
+      transition: transform 0.2s ease;
+      &.rotated { transform: rotate(180deg); }
     }
   }
+
+  .filter-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .filter-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  &.active,
+  &:active {
+    background: var(--color-primary-subtle);
+    box-shadow: 0 0 0 2px rgba(107, 0, 204, 0.18);
+  }
+}
+
+// ── Dropdown ──────────────────────────────────────────────────────────────────
+.filter-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 256px;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.13);
+  border: 1px solid var(--color-border-subtle);
+  z-index: 200;
+  overflow: hidden;
+
+  opacity: 0;
+  transform: scaleY(0.92) translateY(-6px);
+  transform-origin: top left;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+
+  &.visible {
+    opacity: 1;
+    transform: scaleY(1) translateY(0);
+    pointer-events: all;
+  }
+
+  .dropdown-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-border-subtle);
+
+    .dropdown-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+  }
+
+  .dropdown-options {
+    padding: 4px;
+  }
+
+  .dropdown-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-align: left;
+
+    &:hover { background: var(--color-primary-subtle); }
+    &.selected { background: var(--color-primary-subtle); }
+
+    .option-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .option-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-on-surface);
+      flex: 1;
+    }
+
+    .option-check {
+      font-size: 16px;
+      color: var(--color-primary);
+    }
+  }
+
+  .dropdown-footer {
+    padding: 4px 8px 8px;
+    border-top: 1px solid var(--color-border-subtle);
+    margin-top: 4px;
+
+    .dropdown-clear {
+      width: 100%;
+      padding: 10px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-primary);
+      background: none;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+
+      &:hover { background: var(--color-primary-subtle); }
+    }
+  }
+}
+
+// ── Ticket List ───────────────────────────────────────────────────────────────
+.ticket-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// ── States ────────────────────────────────────────────────────────────────────
+.state-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 64px 16px;
+  color: var(--color-text-muted);
+
+  &--error {
+    ion-icon { font-size: 40px; color: #ba1a1a; }
+    p { font-size: 14px; margin: 0; text-align: center; }
+  }
+}
+
+.state-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 64px 16px;
+  color: var(--color-text-muted);
+  text-align: center;
+
+  ion-icon { font-size: 40px; }
+  p { font-size: 14px; margin: 0; }
 }
