@@ -27,4 +27,9 @@ export const routes: Routes = [
       import('./features/dashboard/dashboard.routes').then((m) => m.DASHBOARD_ROUTES),
     canActivate: [authGuard],
   },
+  {
+    path: 'tickets',
+    loadChildren: () => import('./features/ticket/ticket.routes').then((m) => m.TICKET_ROUTES),
+    canActivate: [authGuard],
+  },
 ];
