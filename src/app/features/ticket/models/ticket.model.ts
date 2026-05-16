@@ -7,11 +7,18 @@ export interface TicketRequest {
   sector: string;
 }
 
+export interface TicketUpdatePayload {
+  priority: TicketPriority;
+  status: string;
+  assignTo?: string;
+}
+
 export interface TicketResponse {
   publicId: string;
   title: string;
   description: string;
   priority: TicketPriority;
+  requesterName: string;
   subcategoryId: string;
   status: TicketStatus;
   createdAt: string;
