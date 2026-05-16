@@ -27,4 +27,8 @@ export const routes: Routes = [
       import('./features/dashboard/dashboard.routes').then((m) => m.DASHBOARD_ROUTES),
     canActivate: [authGuard],
   },
+  {
+    path: 'ticket-find',
+    loadComponent: () => import('./features/ticket/ticket-find/ticket-find.page').then( m => m.TicketFindPage)
+  },
 ];

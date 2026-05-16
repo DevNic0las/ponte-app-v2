@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { Category, Sector, Subcategory, TicketRequest, TicketResponse } from '../models/ticket.model';
+import { Category, Sector, Subcategory, TicketRequest, TicketResponse,TicketUpdatePayload } from '../models/ticket.model';
 export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 @Injectable({
   providedIn: 'root',
@@ -23,7 +23,7 @@ export class TicketService {
     return this.http.get<TicketResponse>(`${this.apiUrl}/tickets/${id}`);
   }
 
-  updateTicket(id: string, payload: TicketRequest): Observable<TicketResponse> {
+  updateTicket(id: string, payload: TicketUpdatePayload): Observable<TicketResponse> {
     return this.http.put<TicketResponse>(`${this.apiUrl}/tickets/${id}`, payload);
   }
 

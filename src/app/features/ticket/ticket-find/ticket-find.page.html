@@ -1,0 +1,207 @@
+<!-- src/app/features/ticket/ticket-find/ticket-find.page.html -->
+
+<ion-header>
+  <ion-toolbar color="surface">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard" text="" />
+    </ion-buttons>
+
+    <ion-title class="chat-title" *ngIf="ticket">
+      Ticket #{{ ticket.publicId }}
+    </ion-title>
+
+    <div slot="end" class="status-slot" *ngIf="ticket">
+      <ion-badge
+        [color]="ticket.status | ticketStatusColor"
+        class="status-badge"
+      >
+        {{ ticket.status | ticketStatus }}
+      </ion-badge>
+    </div>
+  </ion-toolbar>
+
+  <!-- Second toolbar: subject + meta -->
+  <ion-toolbar color="surface" class="subtitle-toolbar" *ngIf="ticket">
+    <div class="ticket-meta">
+      <p class="ticket-subject">{{ ticket.title }}</p>
+      <div class="meta-row">
+        <span class="meta-item">
+          <ion-icon name="calendar-outline" />
+          {{ ticket.createdAt }}
+        </span>
+        <span class="meta-item">
+          <ion-icon name="person-outline" />
+          {{ ticket.requesterName }}
+        </span>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<!-- ── Chat history ──────────────────────────────────────────────────── -->
+<ion-content #chatContent class="chat-content">
+  <div class="messages-wrapper">
+
+    <div class="chat-divider">
+      <span class="divider-label">Start of conversation</span>
+    </div>
+
+    <ng-container *ngFor="let msg of messages">
+
+      <!-- User message (left) -->
+      <div class="message-row user-row" *ngIf="isUserMessage(msg)">
+        <div class="bubble bubble-user">
+          <p class="bubble-text">{{ msg.content }}</p>
+        </div>
+        <span class="bubble-time">{{ msg.timestamp }}</span>
+      </div>
+
+      <!-- Admin message (right) -->
+      <div class="message-row admin-row" *ngIf="!isUserMessage(msg)">
+        <div class="bubble bubble-admin">
+          <p class="bubble-text">{{ msg.content }}</p>
+        </div>
+        <span class="bubble-time bubble-time-right">{{ msg.timestamp }}</span>
+      </div>
+
+    </ng-container>
+
+  </div>
+</ion-content>
+
+<!-- ── Admin panel (fixed footer above tab bar) ──────────────────────── -->
+<ion-footer class="admin-footer">
+  <div class="admin-panel">
+
+    <p class="panel-title">Admin Panel</p>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+      <ion-grid class="ion-no-padding">
+        <ion-row class="selects-row">
+
+          <!-- Assign to -->
+          <ion-col>
+            <div class="field-group">
+              <ion-label class="field-label">ASSIGN TO</ion-label>
+              <ion-item
+                lines="none"
+                class="select-item"
+                [class.invalid]="form.get('assignTo')?.invalid && form.get('assignTo')?.touched"
+              >
+                <ion-select
+                  formControlName="assignTo"
+                  placeholder="Select team..."
+                  interface="action-sheet"
+                  cancelText="Cancel"
+                >
+                  <ion-select-option
+                    *ngFor="let option of assignOptions"
+                    [value]="option.value"
+                  >
+                    {{ option.label }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-note
+                color="danger"
+                *ngIf="form.get('assignTo')?.invalid && form.get('assignTo')?.touched"
+              >
+                Required field
+              </ion-note>
+            </div>
+          </ion-col>
+
+          <!-- Status -->
+          <ion-col>
+            <div class="field-group">
+              <ion-label class="field-label">UPDATE STATUS</ion-label>
+              <ion-item
+                lines="none"
+                class="select-item"
+                [class.invalid]="form.get('status')?.invalid && form.get('status')?.touched"
+              >
+                <ion-select
+                  formControlName="status"
+                  placeholder="Select status..."
+                  interface="alert"
+                  cancelText="Cancel"
+                >
+                  <ion-select-option
+                    *ngFor="let option of statusOptions"
+                    [value]="option.value"
+                  >
+                    {{ option.label }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-note
+                color="danger"
+                *ngIf="form.get('status')?.invalid && form.get('status')?.touched"
+              >
+                Required field
+              </ion-note>
+            </div>
+          </ion-col>
+
+        </ion-row>
+      </ion-grid>
+
+      <!-- Priority -->
+      <div class="field-group">
+        <ion-label class="field-label">PRIORITY</ion-label>
+        <ion-item
+          lines="none"
+          class="select-item"
+          [class.invalid]="form.get('priority')?.invalid && form.get('priority')?.touched"
+        >
+          <ion-select
+            formControlName="priority"
+            placeholder="Select priority..."
+            interface="action-sheet"
+            cancelText="Cancel"
+          >
+            <ion-select-option
+              *ngFor="let option of priorities"
+              [value]="option.value"
+            >
+              {{ option.label }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-note
+          color="danger"
+          *ngIf="form.get('priority')?.invalid && form.get('priority')?.touched"
+        >
+          Required field
+        </ion-note>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-buttons">
+        <ion-button
+          expand="block"
+          type="submit"
+          class="btn-submit"
+          [disabled]="isSubmitting"
+        >
+          <ion-icon name="checkmark-circle-outline" slot="start" />
+          SEND UPDATE
+        </ion-button>
+
+        <ion-button
+          expand="block"
+          fill="outline"
+          color="danger"
+          class="btn-close"
+          type="button"
+          (click)="onCloseTicket()"
+        >
+          <ion-icon name="close-circle-outline" slot="start" />
+          CLOSE TICKET
+        </ion-button>
+      </div>
+
+    </form>
+  </div>
+</ion-footer>
