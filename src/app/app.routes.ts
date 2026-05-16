@@ -28,7 +28,8 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
-    path: 'ticket-find',
-    loadComponent: () => import('./features/ticket/ticket-find/ticket-find.page').then( m => m.TicketFindPage)
+    path: 'tickets',
+    loadChildren: () => import('./features/ticket/ticket.routes').then((m) => m.TICKET_ROUTES),
+    canActivate: [authGuard],
   },
 ];

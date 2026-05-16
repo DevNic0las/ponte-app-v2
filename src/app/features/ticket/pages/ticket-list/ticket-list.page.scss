@@ -1,0 +1,62 @@
+// ticket-list.page.scss
+
+ion-content {
+  // Usa --color-surface-low que você já tem definido (#ebebeb)
+  // Isso cria o contraste necessário para os cards brancos aparecerem
+  --background: var(--color-surface-low);
+}
+.ticket-list-page {
+    padding: 24px 16px 32px;
+  max-width: 640px;
+  margin: 0 auto;
+
+  &__editorial {
+    margin-bottom: 28px;
+  }
+
+  &__eyebrow {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary, #4d0096);
+    margin-bottom: 6px;
+  }
+
+  &__heading {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--color-on-surface, #1a1c1c);
+    margin: 0 0 8px;
+    line-height: 1.2;
+  }
+
+  &__subheading {
+    font-size: 13px;
+    color: var(--color-on-surface-variant, #4b4455);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  &__center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 0;
+    gap: 12px;
+    color: var(--color-on-surface-variant, #4b4455);
+
+    &--error {
+      text-align: center;
+      font-size: 14px;
+    }
+  }
+}

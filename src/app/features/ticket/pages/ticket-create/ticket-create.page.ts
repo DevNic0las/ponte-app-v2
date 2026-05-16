@@ -29,9 +29,9 @@ import {
   barChartOutline,
   personOutline,
 } from 'ionicons/icons';
-import { Category, Sector, Subcategory, TicketRequest } from '../models/ticket.model';
+import { Category, Sector, Subcategory, TicketRequest } from '../../models/ticket.model';
 import { environment } from 'src/environments/environment';
-import { TicketService } from '../services/ticket.service';
+import { TicketService } from '../../services/ticket.service';
 import { firstValueFrom, Observable, Subject, switchMap, tap } from 'rxjs';
 import { ToastService } from 'src/app/shared/services/toast';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';

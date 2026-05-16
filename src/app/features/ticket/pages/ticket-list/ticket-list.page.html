@@ -1,0 +1,61 @@
+<!-- ticket-list.page.html -->
+
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button routerLink="/dashboard">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>Atendimento</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="search"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="ticket-list-page">
+    <!-- Cabeçalho editorial -->
+    <div class="ticket-list-page__editorial">
+      <span class="ticket-list-page__eyebrow">VISÃO GERAL</span>
+      <h2 class="ticket-list-page__heading">Gerenciamento de Chamados</h2>
+      <p class="ticket-list-page__subheading">
+        Acompanhe e responda às solicitações ativas da plataforma.
+      </p>
+    </div>
+
+    <!-- Estado: loading -->
+    @if (isLoading()) {
+    <div class="ticket-list-page__center">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+    </div>
+    }
+
+    <!-- Estado: erro -->
+    @if (error()) {
+    <div class="ticket-list-page__center ticket-list-page__center--error">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <p>{{ error() }}</p>
+      <ion-button fill="outline" color="primary" (click)="loadTickets()">
+        Tentar novamente
+      </ion-button>
+    </div>
+    }
+
+    <!-- Lista de cards -->
+    @if (!isLoading() && !error()) {
+    <div class="ticket-list-page__list">
+      @for (ticket of tickets(); track trackByTicketId($index, ticket)) {
+      <app-ticket-list-card [ticket]="ticket" (ticketClick)="onTicketSelected($event)" />
+      }
+    </div>
+    }
+  </div>
+</ion-content>
+
+ <app-bottom-nav></app-bottom-nav> 
