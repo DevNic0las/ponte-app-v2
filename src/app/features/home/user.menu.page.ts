@@ -1,16 +1,29 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common'; // Necessário para o *ngFor
-import { 
-  IonHeader, IonToolbar, IonTitle, IonContent, 
-  IonCard, IonCardContent, IonIcon, IonTabBar, 
-  IonTabButton, IonLabel 
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonCard,
+  IonCardContent,
+  IonIcon,
+  IonTabBar,
+  IonTabButton,
+  IonLabel,
 } from '@ionic/angular/standalone'; // Imports dos componentes
 import { addIcons } from 'ionicons'; // Para registrar os ícones
-import { 
-  buildOutline, warningOutline, ticketOutline, 
-  home, barChartOutline, personOutline, chevronForwardOutline 
+import {
+  buildOutline,
+  warningOutline,
+  ticketOutline,
+  home,
+  barChartOutline,
+  personOutline,
+  chevronForwardOutline,
 } from 'ionicons/icons'; // Ícones específicos
+import { BottomNavComponent } from 'src/app/shared/components/bottom-nav/bottom-nav.component';
 
 @Component({
   selector: 'app-user-menu',
@@ -19,13 +32,20 @@ import {
   standalone: true, // Define como standalone
   imports: [
     CommonModule,
-    IonHeader, IonToolbar, IonTitle, IonContent, 
-    IonCard, IonCardContent, IonIcon, IonTabBar, 
-    IonTabButton, IonLabel
-  ]
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonCard,
+    IonCardContent,
+    IonIcon,
+    IonTabBar,
+    IonTabButton,
+    IonLabel,
+    BottomNavComponent,
+  ],
 })
 export class UserMenuPage {
-
   actions = [
     {
       icon: 'build-outline',
@@ -49,14 +69,14 @@ export class UserMenuPage {
 
   constructor(private router: Router) {
     // É OBRIGATÓRIO registrar os ícones que você usa no HTML
-    addIcons({ 
-      'build-outline': buildOutline, 
-      'warning-outline': warningOutline, 
+    addIcons({
+      'build-outline': buildOutline,
+      'warning-outline': warningOutline,
       'ticket-outline': ticketOutline,
-      'home': home,
+      home: home,
       'bar-chart-outline': barChartOutline,
       'person-outline': personOutline,
-      'chevron-forward-outline': chevronForwardOutline
+      'chevron-forward-outline': chevronForwardOutline,
     });
   }
 

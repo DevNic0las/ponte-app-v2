@@ -9,7 +9,7 @@ export const routes: Routes = [
   },
   {
     path: 'home',
-    loadComponent: () => import('./features/home/home.page').then((m) => m.HomePage),
+    loadComponent: () => import('./features/home/user.menu.page').then((m) => m.UserMenuPage),
     canActivate: [authGuard],
   },
   {
@@ -18,7 +18,7 @@ export const routes: Routes = [
   },
   {
     path: 'profile',
-    loadComponent: () => import('./features/profile/profile.page').then((m) => m.ProfilePage),
+    loadComponent: () => import('./features/profile/pages/profile.page').then((m) => m.ProfilePage),
     canActivate: [authGuard],
   },
   {
