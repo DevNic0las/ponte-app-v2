@@ -1,0 +1,127 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="app-toolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" class="back-btn">
+        <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="toolbar-title">Novo Chamado</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="page-content">
+  <div class="form-wrapper">
+    <div class="editorial-header">
+      <span class="section-label">TIPO DE SOLICITAÇÃO</span>
+      <h2 class="section-title">RELATAR UM PROBLEMA</h2>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="ticket-form">
+      <div class="field-group">
+        <label class="field-label">Titulo do chamado</label>
+        <ion-input
+          formControlName="title"
+          type="text"
+          interface="action-sheet"
+          placeholder="Digite o título do chamado"
+          class="custom-input"
+        ></ion-input>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Departamento de TI</label>
+        <ion-select
+          formControlName="category"
+          interface="action-sheet"
+          placeholder="Selecione o departamento"
+          class="custom-select"
+        >
+          <ion-select-option *ngFor="let d of categories$ | async" [value]="d.publicId">
+            {{ d.name }}
+          </ion-select-option>
+        </ion-select>
+      </div>
+
+      <!-- <div class="field-group">
+        <label class="field-label">Número</label>
+        <div class="input-wrapper">
+          <ion-input
+            [(ngModel)]="form.numero"
+            name="numero"
+            type="text"
+            placeholder="480028922"
+            class="custom-input"
+          ></ion-input>
+        </div>
+      </div> -->
+
+      <div class="field-group">
+        <label class="field-label">item</label>
+        <ion-select
+          formControlName="subcategory"
+          interface="action-sheet"
+          placeholder="Selecione o item"
+          class="custom-select"
+          [disabled]="!(subcategories$ | async)"
+        >
+          <ion-select-option *ngFor="let i of subcategories$ | async" [value]="i.publicId">
+            {{ i.name }}
+          </ion-select-option>
+        </ion-select>
+      </div>
+      <div class="field-group" *ngIf="showPeriferico">
+        <label class="field-label">Periférico</label>
+        <div class="select-wrapper">
+          <ion-select
+            formControlName="peripheral"
+            interface="action-sheet"
+            placeholder="Selecione o periférico"
+            class="custom-select"
+          >
+            <ion-select-option *ngFor="let p of peripheral" [value]="p">{{ p }}</ion-select-option>
+          </ion-select>
+          <ion-icon name="chevron-down-outline" class="select-chevron"></ion-icon>
+        </div>
+      </div>
+
+      <!-- Setor -->
+      <div class="field-group">
+        <label class="field-label">Setor</label>
+        <div class="select-wrapper">
+          <ion-select
+            formControlName="sector"
+            interface="action-sheet"
+            placeholder="Selecione o setor"
+            class="custom-select"
+          >
+            <ion-select-option *ngFor="let p of sectors$ | async" [value]="p.publicId"
+              >{{ p.name }}</ion-select-option
+            >
+          </ion-select>
+          <ion-icon name="chevron-down-outline" class="select-chevron"></ion-icon>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Descreva a solicitação</label>
+        <div class="textarea-wrapper">
+          <ion-textarea
+            formControlName="description"
+            placeholder="Descreva o problema com detalhes..."
+            [autoGrow]="false"
+            rows="5"
+            class="custom-textarea"
+          ></ion-textarea>
+        </div>
+      </div>
+
+      <div class="submit-container">
+        <ion-button type="submit" expand="block" class="submit-btn" [disabled]="isLoading">
+          <ion-spinner *ngIf="isLoading" name="crescent" slot="start"></ion-spinner>
+          {{ isLoading ? 'ENVIANDO...' : 'ENVIAR' }}
+        </ion-button>
+      </div>
+    </form>
+  </div>
+</ion-content>
+<app-bottom-nav></app-bottom-nav>

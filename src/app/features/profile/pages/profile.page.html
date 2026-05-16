@@ -1,13 +1,108 @@
-<ion-header [translucent]="true">
+<ion-header class="ponte-header ion-no-border">
   <ion-toolbar>
-    <ion-title>profile</ion-title>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" class="menu-btn">
+        <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title class="ponte-logo">Ponte</ion-title>
+
+    <ion-buttons slot="end">
+      <!-- <ion-avatar class="header-avatar">
+        <img [src]="headerAvatar" alt="User profile" />
+      </ion-avatar> -->
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">profile</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="profile-content" *ngIf="profile$ | async as profile">
+  <!-- Hero / Profile Header -->
+  <div class="profile-hero">
+    <div class="avatar-wrapper">
+      <ion-avatar class="profile-avatar">
+        <img [src]="profile.avatar || 'https://via.placeholder.com/150'" [alt]="profile.name" />
+      </ion-avatar>
+      <button class="edit-fab ion-activatable" (click)="onEditProfile()">
+        <ion-ripple-effect></ion-ripple-effect>
+        <ion-icon name="create-outline"></ion-icon>
+      </button>
+    </div>
+
+    <div class="profile-info">
+      <span class="role-badge">Colaborador</span>
+      <h1 class="profile-name">{{ profile.name }}</h1>
+      <p class="profile-department">{{ profile.sector }}</p>
+      <p class="profile-role">{{ profile.role }}</p>
+    </div>
+  </div>
+
+  <!-- Access Info Card -->
+  <ion-card class="info-card">
+    <ion-card-content>
+      <p class="card-section-label">Informações de Acesso</p>
+
+      <ion-item lines="none" class="info-item">
+        <div class="info-icon-wrap" slot="start">
+          <ion-icon name="mail-outline"></ion-icon>
+        </div>
+        <ion-label>
+          <p class="info-label">E-mail Corporativo</p>
+          <h3 class="info-value">{{ profile.email }}</h3>
+        </ion-label>
+      </ion-item>
+
+      <ion-item lines="none" class="info-item">
+        <div class="info-icon-wrap" slot="start">
+          <ion-icon name="badge-outline"></ion-icon>
+        </div>
+        <ion-label>
+          <p class="info-label">ID do Funcionário</p>
+          <h3 class="info-value">{{ profile.publicId }}</h3>
+        </ion-label>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Preferences Card -->
+  <ion-card class="info-card prefs-card">
+    <ion-card-content class="ion-no-padding">
+      <div class="card-header-row">
+        <p class="card-section-label">Preferências</p>
+      </div>
+
+      <ion-item button detail="false" lines="full" class="pref-item" (click)="onNotifications()">
+        <div class="info-icon-wrap" slot="start">
+          <ion-icon name="notifications-outline"></ion-icon>
+        </div>
+        <ion-label>Notificações</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" class="chevron"></ion-icon>
+      </ion-item>
+
+      <ion-item button detail="false" lines="none" class="pref-item" (click)="onPrivacy()">
+        <div class="info-icon-wrap" slot="start">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+        </div>
+        <ion-label>Privacidade e Segurança</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" class="chevron"></ion-icon>
+      </ion-item>
+
+      <div class="divider"></div>
+
+      <ion-item
+        button
+        detail="false"
+        lines="none"
+        class="pref-item logout-item"
+        (click)="onLogout()"
+      >
+        <div class="info-icon-wrap logout-icon-wrap" slot="start">
+          <ion-icon name="log-out-outline"></ion-icon>
+        </div>
+        <ion-label class="logout-label">Sair da Conta</ion-label>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
 </ion-content>
+
+<app-bottom-nav></app-bottom-nav>

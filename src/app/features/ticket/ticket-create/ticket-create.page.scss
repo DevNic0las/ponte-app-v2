@@ -1,0 +1,291 @@
+// ============================================================
+// Variáveis de tema
+// ============================================================
+:root {
+  --color-primary:           #4d0096;
+  --color-primary-container: #6b00cc;
+  --color-on-primary:        #ffffff;
+  --color-surface:           #f9f9f9;
+  --color-surface-low:       #ebebeb;
+  --color-on-surface:        #1a1c1c;
+  --color-on-surface-var:    #4b4455;
+  --radius-md: 12px;
+  --radius-full: 9999px;
+}
+
+// ============================================================
+// Toolbar
+// ============================================================
+.app-toolbar {
+  --background: #ffffff;
+  --border-width: 0;
+
+  .back-btn {
+    --color: var(--color-primary-container);
+  }
+
+  .toolbar-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    color: var(--color-primary-container);
+    text-align: center;
+  }
+}
+
+// ============================================================
+// Content
+// ============================================================
+.page-content {
+  --background: #f9f9f9;
+  --padding-bottom: 120px;
+}
+
+.form-wrapper {
+  padding: 32px 24px 40px;
+}
+
+// ============================================================
+// Editorial Header
+// ============================================================
+.editorial-header {
+  text-align: center;
+  margin-bottom: 40px;
+
+  .section-label {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #4b4455;
+    margin-bottom: 6px;
+  }
+
+  .section-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-primary-container);
+    margin: 0;
+  }
+}
+
+// ============================================================
+// Form
+// ============================================================
+.ticket-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: fadeSlideIn 0.2s ease forwards;
+
+  .field-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #4b4455;         // ← sem transparência
+    padding-left: 4px;
+  }
+}
+
+// ============================================================
+// Select
+// ============================================================
+.select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #ebebeb;
+  border-radius: var(--radius-md);
+  height: 56px;
+
+  .select-chevron {
+    position: absolute;
+    right: 14px;
+    color: #4b4455;
+    font-size: 18px;
+    pointer-events: none;
+  }
+}
+
+.custom-select {
+  --background: transparent;
+  --color: #1a1c1c;
+  --placeholder-color: #888888;    // ← placeholder bem visível
+  --padding-start: 16px;
+  --padding-end: 40px;
+  --highlight-height: 0;
+
+  width: 100%;
+  height: 56px;
+
+  &::part(text) {
+    color: #1a1c1c !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+  }
+
+  &::part(placeholder) {
+    color: #888888 !important;     // ← cinza visível, não transparente
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+  }
+
+  &::part(icon) {
+    display: none;
+  }
+}
+
+// ============================================================
+// Input
+// ============================================================
+.input-wrapper {
+  background: #ebebeb;
+  border-radius: var(--radius-md);
+  height: 56px;
+  display: flex;
+  align-items: center;
+}
+
+.custom-input {
+  --background: transparent;
+  --color: #1a1c1c;
+  --placeholder-color: #888888;    // ← placeholder visível
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --highlight-height: 0;
+
+  width: 100%;
+  height: 56px;
+
+  &::part(native) {
+    color: #1a1c1c !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    height: 56px;
+    padding: 0 16px;
+    background: transparent;
+    caret-color: var(--color-primary);
+
+    &::placeholder {
+      color: #888888 !important;
+    }
+  }
+}
+
+// ============================================================
+// Textarea
+// ============================================================
+.textarea-wrapper {
+  background: #ebebeb;
+  border-radius: var(--radius-md);
+}
+
+.custom-textarea {
+  --background: transparent;
+  --color: #1a1c1c;
+  --placeholder-color: #888888;    // ← placeholder visível
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  --highlight-height: 0;
+
+  width: 100%;
+
+  &::part(native) {
+    color: #1a1c1c !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    background: transparent;
+    caret-color: var(--color-primary);
+    resize: none;
+
+    &::placeholder {
+      color: #888888 !important;
+    }
+  }
+}
+
+// ============================================================
+// Submit
+// ============================================================
+.submit-container {
+  padding-top: 12px;
+}
+
+.submit-btn {
+  --background: var(--color-primary-container);
+  --background-activated: #5500aa;
+  --color: #ffffff;
+  --border-radius: var(--radius-md);
+  --box-shadow: 0 8px 24px rgba(107, 0, 204, 0.25);
+
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  height: 56px;
+}
+
+// ============================================================
+// Bottom Navigation
+// ============================================================
+.bottom-nav {
+  --background: #ffffff;
+  --border: 1px solid #f0f0f0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.nav-tab {
+  --color: #9e9e9e;
+  --color-selected: var(--color-primary-container);
+
+  ion-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  ion-icon {
+    font-size: 22px;
+  }
+
+  &.nav-tab--active {
+    --color: var(--color-primary-container);
+    background: rgba(107, 0, 204, 0.06);
+    border-radius: 12px;
+  }
+}
+
+// ============================================================
+// Animação
+// ============================================================
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
