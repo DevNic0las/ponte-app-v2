@@ -2,7 +2,7 @@
 
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { arrowBack, search, home, ticket, barChart, person } from 'ionicons/icons';
 import {
@@ -50,7 +50,7 @@ import { BottomNavComponent } from 'src/app/shared/components/bottom-nav/bottom-
 })
 export class TicketListPage implements OnInit {
   private readonly ticketService = inject(TicketService);
-
+  private readonly routerLink = inject(Router);
   tickets = signal<TicketResponse[]>([]);
   isLoading = signal(true);
   error = signal<string | null>(null);
@@ -87,6 +87,6 @@ export class TicketListPage implements OnInit {
     return ticket.publicId;
   }
   onTicketSelected(ticket: TicketResponse): void {
-    console.log('Ticket selecionado:', ticket.publicId);
+    this.routerLink.navigate(['/tickets/ticket-find', ticket.publicId]);
   }
 }

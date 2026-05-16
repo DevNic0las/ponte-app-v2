@@ -1,17 +1,48 @@
-/* Core CSS required for Ionic components to work properly */
 @import '@ionic/angular/css/core.css';
-
-/* Basic CSS for apps built with Ionic */
 @import '@ionic/angular/css/normalize.css';
 @import '@ionic/angular/css/structure.css';
 @import '@ionic/angular/css/typography.css';
 @import '@ionic/angular/css/display.css';
-
-/* Optional CSS utils that can be commented out */
 @import '@ionic/angular/css/padding.css';
 @import '@ionic/angular/css/float-elements.css';
 @import '@ionic/angular/css/text-alignment.css';
 @import '@ionic/angular/css/text-transformation.css';
 @import '@ionic/angular/css/flex-utils.css';
 
-@import '@ionic/angular/css/palettes/dark.system.css';
+/* REMOVIDO dark.system.css — causava fundo escuro automático */
+
+:root {
+  /* ── Tema global ─────────────────────────────── */
+  --color-primary:           #6b00cc;
+  --color-on-primary:        #ffffff;
+  --color-primary-subtle:    #f4ebff;
+  --color-surface:           #ffffff;
+  --color-background:        #ffffff;
+  --color-on-surface:        #1a1c1c;
+  --color-border-subtle:     #e4e4e7;
+  --color-text-muted:        #a1a1aa;
+  --color-primary-container: #6b00cc;
+  --color-on-surface-var:    #4b4455;
+  --color-placeholder:       #888888;
+  --color-surface-low:       #ebebeb;
+  --radius-md:               12px;
+  --radius-full:             9999px;
+
+  /* ── Mapeia variáveis Ionic para o tema global ─ */
+  --ion-background-color:        var(--color-background);
+  --ion-text-color:              var(--color-on-surface);
+  --ion-color-primary:           var(--color-primary);
+  --ion-color-primary-contrast:  var(--color-on-primary);
+  --ion-color-primary-shade:     #5a00aa;
+  --ion-color-primary-tint:      var(--color-primary-subtle);
+  --ion-color-medium:            var(--color-text-muted);
+  --ion-color-medium-contrast:   var(--color-on-surface);
+  --ion-color-light:             var(--color-surface-low);
+  --ion-color-light-contrast:    var(--color-on-surface);
+  --ion-toolbar-background:      var(--color-surface);
+  --ion-item-background:         var(--color-surface);
+  --ion-card-background:         var(--color-surface);
+  --ion-border-color:            var(--color-border-subtle);
+  --ion-tab-bar-background:      var(--color-surface);
+  --ion-tab-bar-border-color:    var(--color-border-subtle);
+}

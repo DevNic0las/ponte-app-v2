@@ -1,54 +1,54 @@
-<!-- src/app/features/ticket/ticket-find/ticket-find.page.html -->
+<!-- src/app/features/ticket/pages/ticket-find/ticket-find.page.html -->
 
-<ion-header>
-  <ion-toolbar color="surface">
+<ion-header class="ticket-header">
+
+  <!-- Toolbar principal -->
+  <ion-toolbar class="main-toolbar">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/dashboard" text="" />
+      <ion-back-button defaultHref="/tickets" text=""></ion-back-button>
     </ion-buttons>
 
     <ion-title class="chat-title" *ngIf="ticket">
-      Ticket #{{ ticket.publicId }}
+      Chamado #{{ ticket.publicId }}
     </ion-title>
 
     <div slot="end" class="status-slot" *ngIf="ticket">
-      <ion-badge
-        [color]="ticket.status | ticketStatusColor"
-        class="status-badge"
-      >
+      <span class="status-badge" [attr.data-status]="ticket.status">
         {{ ticket.status | ticketStatus }}
-      </ion-badge>
+      </span>
     </div>
   </ion-toolbar>
 
-  <!-- Second toolbar: subject + meta -->
-  <ion-toolbar color="surface" class="subtitle-toolbar" *ngIf="ticket">
+  <!-- Segunda toolbar: assunto + meta -->
+  <ion-toolbar class="subtitle-toolbar" *ngIf="ticket">
     <div class="ticket-meta">
       <p class="ticket-subject">{{ ticket.title }}</p>
       <div class="meta-row">
         <span class="meta-item">
-          <ion-icon name="calendar-outline" />
-          {{ ticket.createdAt }}
+          <ion-icon name="calendar-outline"></ion-icon>
+          {{ ticket.createdAt | date: 'dd MMM, yyyy' }}
         </span>
         <span class="meta-item">
-          <ion-icon name="person-outline" />
-          {{ ticket.requesterName }}
+          <ion-icon name="person-outline"></ion-icon>
+          {{ ticket.requestedBy?.name ?? '—' }}
         </span>
       </div>
     </div>
   </ion-toolbar>
+
 </ion-header>
 
-<!-- ── Chat history ──────────────────────────────────────────────────── -->
+<!-- ── Histórico do chat ──────────────────────────────────────────── -->
 <ion-content #chatContent class="chat-content">
   <div class="messages-wrapper">
 
     <div class="chat-divider">
-      <span class="divider-label">Start of conversation</span>
+      <span class="divider-label">Início do atendimento</span>
     </div>
 
     <ng-container *ngFor="let msg of messages">
 
-      <!-- User message (left) -->
+      <!-- Mensagem do usuário (esquerda) -->
       <div class="message-row user-row" *ngIf="isUserMessage(msg)">
         <div class="bubble bubble-user">
           <p class="bubble-text">{{ msg.content }}</p>
@@ -56,7 +56,7 @@
         <span class="bubble-time">{{ msg.timestamp }}</span>
       </div>
 
-      <!-- Admin message (right) -->
+      <!-- Mensagem do admin (direita) -->
       <div class="message-row admin-row" *ngIf="!isUserMessage(msg)">
         <div class="bubble bubble-admin">
           <p class="bubble-text">{{ msg.content }}</p>
@@ -69,21 +69,21 @@
   </div>
 </ion-content>
 
-<!-- ── Admin panel (fixed footer above tab bar) ──────────────────────── -->
+<!-- ── Painel administrativo ─────────────────────────────────────── -->
 <ion-footer class="admin-footer">
   <div class="admin-panel">
 
-    <p class="panel-title">Admin Panel</p>
+    <p class="panel-title">Painel Administrativo</p>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
       <ion-grid class="ion-no-padding">
         <ion-row class="selects-row">
 
-          <!-- Assign to -->
+          <!-- Atribuir tarefa -->
           <ion-col>
             <div class="field-group">
-              <ion-label class="field-label">ASSIGN TO</ion-label>
+              <label class="field-label">ATRIBUIR TAREFA</label>
               <ion-item
                 lines="none"
                 class="select-item"
@@ -91,9 +91,9 @@
               >
                 <ion-select
                   formControlName="assignTo"
-                  placeholder="Select team..."
+                  placeholder="Selecionar equipe..."
                   interface="action-sheet"
-                  cancelText="Cancel"
+                  cancelText="Cancelar"
                 >
                   <ion-select-option
                     *ngFor="let option of assignOptions"
@@ -107,15 +107,15 @@
                 color="danger"
                 *ngIf="form.get('assignTo')?.invalid && form.get('assignTo')?.touched"
               >
-                Required field
+                Campo obrigatório
               </ion-note>
             </div>
           </ion-col>
 
-          <!-- Status -->
+          <!-- Atualização de status -->
           <ion-col>
             <div class="field-group">
-              <ion-label class="field-label">UPDATE STATUS</ion-label>
+              <label class="field-label">ATUALIZAR STATUS</label>
               <ion-item
                 lines="none"
                 class="select-item"
@@ -123,9 +123,9 @@
               >
                 <ion-select
                   formControlName="status"
-                  placeholder="Select status..."
-                  interface="alert"
-                  cancelText="Cancel"
+                  placeholder="Selecionar status..."
+                  interface="action-sheet"
+                  cancelText="Cancelar"
                 >
                   <ion-select-option
                     *ngFor="let option of statusOptions"
@@ -139,7 +139,7 @@
                 color="danger"
                 *ngIf="form.get('status')?.invalid && form.get('status')?.touched"
               >
-                Required field
+                Campo obrigatório
               </ion-note>
             </div>
           </ion-col>
@@ -147,9 +147,9 @@
         </ion-row>
       </ion-grid>
 
-      <!-- Priority -->
+      <!-- Prioridade -->
       <div class="field-group">
-        <ion-label class="field-label">PRIORITY</ion-label>
+        <label class="field-label">PRIORIDADE</label>
         <ion-item
           lines="none"
           class="select-item"
@@ -157,9 +157,9 @@
         >
           <ion-select
             formControlName="priority"
-            placeholder="Select priority..."
+            placeholder="Selecionar prioridade..."
             interface="action-sheet"
-            cancelText="Cancel"
+            cancelText="Cancelar"
           >
             <ion-select-option
               *ngFor="let option of priorities"
@@ -173,11 +173,11 @@
           color="danger"
           *ngIf="form.get('priority')?.invalid && form.get('priority')?.touched"
         >
-          Required field
+          Campo obrigatório
         </ion-note>
       </div>
 
-      <!-- Action buttons -->
+      <!-- Botões de ação -->
       <div class="action-buttons">
         <ion-button
           expand="block"
@@ -185,20 +185,19 @@
           class="btn-submit"
           [disabled]="isSubmitting"
         >
-          <ion-icon name="checkmark-circle-outline" slot="start" />
-          SEND UPDATE
+          <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+          ENVIAR ATUALIZAÇÃO
         </ion-button>
 
         <ion-button
           expand="block"
           fill="outline"
-          color="danger"
           class="btn-close"
           type="button"
           (click)="onCloseTicket()"
         >
-          <ion-icon name="close-circle-outline" slot="start" />
-          CLOSE TICKET
+          <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+          ENCERRAR CHAMADO
         </ion-button>
       </div>
 

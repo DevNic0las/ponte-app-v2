@@ -46,10 +46,10 @@ import {
   closeCircleOutline, // ← adicionado
 } from 'ionicons/icons';
 
-import { TicketService } from '../services/ticket.service';
-import { TicketPriority, TicketResponse, TicketUpdatePayload } from '../models/ticket.model';
-import { TicketMessage } from '../models/ticket-message.model';
-import { TicketStatusPipe, TicketStatusColorPipe } from '../pipe/ticket-status.pipe';
+import { TicketService } from '../../services/ticket.service';
+import { TicketPriority, TicketResponse, TicketUpdatePayload } from '../../models/ticket.model';
+import { TicketMessage } from '../../models/ticket-message.model';
+import { TicketStatusPipe, TicketStatusColorPipe } from '../../pipe/ticket-status.pipe';
 
 // ── Tipos locais ─────────────────────────────────────────────────────
 interface SelectOption {
@@ -239,13 +239,19 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
     this.ticketService.findTicketById(publicId).subscribe({
       next: (data) => {
         this.ticket = data;
+
+        // Pré-popula o form com os valores atuais do ticket
+        this.form.patchValue({
+          status: data.status,
+          priority: data.priority,
+          assignTo: data.assignedTo ?? null,
+        });
       },
       error: () => {
         this.showToast('Failed to load ticket data.', 'danger');
       },
     });
 
-    // Carrega mensagens do localStorage ou usa as iniciais
     this.messages = this.loadMessages();
     this.shouldScrollToBottom = true;
   }

@@ -14,4 +14,10 @@ export const TICKET_ROUTES: Routes = [
       import('./pages/ticket-list/ticket-list.page').then((m) => m.TicketListPage),
     canActivateChild: [authGuard],
   },
+  {
+    path: 'ticket-find/:publicId',
+    loadComponent: () =>
+      import('./pages/ticket-find/ticket-find.page').then((m) => m.TicketFindPage),
+    canActivateChild: [authGuard],
+  },
 ];

@@ -12,13 +12,18 @@ export interface TicketUpdatePayload {
   status: string;
   assignTo?: string;
 }
+ 
+export interface RequestedBy{
+  name: string;
+  email:string;
+}
 
 export interface TicketResponse {
   publicId: string;
   title: string;
   description: string;
   priority: TicketPriority;
-  requesterName: string;
+  requestedBy:RequestedBy;
   subcategoryId: string;
   status: TicketStatus;
   createdAt: string;
