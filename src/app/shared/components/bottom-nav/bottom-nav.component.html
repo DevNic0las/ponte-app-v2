@@ -1,18 +1,27 @@
-<ion-footer class="bottom-nav-footer">
-  <ion-tab-bar class="bottom-nav">
-    <ion-tab-button
-      *ngFor="let item of navItems"
-      [routerLink]="item.route"
-      routerLinkActive
-      #rla="routerLinkActive"
-      [class.tab-selected]="rla.isActive"
-      class="bottom-nav__tab"
-    >
-      <ion-icon
-        [name]="rla.isActive ? item.activeIcon : item.icon"
-        class="bottom-nav__icon"
-      ></ion-icon>
-      <ion-label class="bottom-nav__label">{{ item.label }}</ion-label>
+<ion-footer>
+  <ion-tab-bar>
+
+    <ion-tab-button routerLink="/home" routerLinkActive="tab-selected">
+      <ion-icon name="home-outline"></ion-icon>
+      <ion-label>Início</ion-label>
     </ion-tab-button>
+
+    <ion-tab-button routerLink="/tickets" routerLinkActive="tab-selected">
+      <ion-icon name="ticket-outline"></ion-icon>
+      <ion-label>Atendimento</ion-label>
+    </ion-tab-button>
+
+    @if (isTechnician$ | async) {
+      <ion-tab-button routerLink="/dashboard" routerLinkActive="tab-selected">
+        <ion-icon name="bar-chart-outline"></ion-icon>
+        <ion-label>Dasboard</ion-label>
+      </ion-tab-button>
+    }
+
+    <ion-tab-button routerLink="/profile" routerLinkActive="tab-selected">
+      <ion-icon name="person-outline"></ion-icon>
+      <ion-label>Perfil</ion-label>
+    </ion-tab-button>
+
   </ion-tab-bar>
 </ion-footer>

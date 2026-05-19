@@ -71,6 +71,7 @@ export class DashboardHomePage {
   );
 
   onActionCardClick(card: ActionCard): void {
+    
     this.router.navigate([card.route]);
   }
 
