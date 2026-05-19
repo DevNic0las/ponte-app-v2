@@ -4,7 +4,7 @@
 
 export const  environment = {
   production: false,
-  apiUrl: 'http://localhost:8080/api',
+  apiUrl: 'https://support-ticket-api-upaj.onrender.com/api',
 };
 
 /*

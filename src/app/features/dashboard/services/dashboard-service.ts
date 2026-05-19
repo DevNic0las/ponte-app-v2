@@ -8,8 +8,7 @@ import { TicketCount } from '../models/dashboard-home/ticket-count.interface';
 })
 export class DashboardService {
   private readonly prefix = 'tickets';
-
-  private readonly apiUrl = 'http://localhost:8080/api';
+  private readonly apiUrl = environment.apiUrl;
 
   private readonly http: HttpClient = inject(HttpClient);
 
