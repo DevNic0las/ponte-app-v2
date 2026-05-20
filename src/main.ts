@@ -10,7 +10,7 @@ import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './app/core/interceptor/auth';
-import { provideAppInitializer, inject } from '@angular/core';
+import { APP_INITIALIZER } from '@angular/core';
 import { AuthService } from './app/features/auth/services/extractRole.service';
 
 bootstrapApplication(AppComponent, {
@@ -19,9 +19,12 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideIonicAngular({ mode: 'md' }),
     provideHttpClient(withInterceptors([authInterceptor])),
-    provideAppInitializer(() => {
-      const authService = inject(AuthService);
-      return authService.loadRoleFromStorage();
-    }),
+    AuthService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (authService: AuthService) => () => authService.loadRoleFromStorage(),
+      deps: [AuthService],
+      multi: true,
+    },
   ],
 });
