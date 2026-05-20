@@ -87,6 +87,6 @@ export class TicketListPage implements OnInit {
     return ticket.publicId;
   }
   onTicketSelected(ticket: TicketResponse): void {
-    this.routerLink.navigate(['/tickets/ticket-find', ticket.publicId]);
+    this.routerLink.navigate(['/tickets/find', ticket.publicId]);
   }
 }

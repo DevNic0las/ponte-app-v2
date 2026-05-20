@@ -47,7 +47,7 @@ import {
 } from 'ionicons/icons';
 
 import { TicketService } from '../../services/ticket.service';
-import { TicketPriority, TicketResponse, TicketUpdatePayload } from '../../models/ticket.model';
+import { TicketPriority, TicketResponse } from '../../models/ticket.model';
 import { TicketMessage } from '../../models/ticket-message.model';
 import { TicketStatusPipe, TicketStatusColorPipe } from '../../pipe/ticket-status.pipe';
 
@@ -114,10 +114,10 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
   // ── Select options ───────────────────────────────────────────────────
 
   readonly priorities: PriorityOption[] = [
-    { label: 'Low', value: 'LOW' },
-    { label: 'Medium', value: 'MEDIUM' },
-    { label: 'High', value: 'HIGH' },
-    { label: 'Critical', value: 'CRITICAL' },
+    { label: 'Baixo', value: 'LOW' },
+    { label: 'Médio', value: 'MEDIUM' },
+    { label: 'Alto', value: 'HIGH' },
+    { label: 'Crítico', value: 'CRITICAL' },
   ];
 
   readonly assignOptions: SelectOption[] = [
@@ -131,10 +131,10 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
   ];
 
   readonly statusOptions: SelectOption[] = [
-    { label: 'Open', value: 'OPEN' },
-    { label: 'In Progress', value: 'IN_PROGRESS' },
-    { label: 'In Analysis', value: 'IN_ANALYSIS' },
-    { label: 'Closed', value: 'CLOSED' },
+    { label: 'Aberto', value: 'OPEN' },
+    { label: 'Em Andamento', value: 'IN_PROGRESS' },
+    { label: 'Em Análise', value: 'IN_ANALYSIS' },
+    { label: 'Fechado', value: 'CLOSED' },
   ];
 
   // ── Form ─────────────────────────────────────────────────────────────
@@ -163,12 +163,6 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
     }
   }
 
-  // ── Public helpers ───────────────────────────────────────────────────
-
-  isUserMessage(msg: TicketMessage): boolean {
-    return msg.sender === 'USER';
-  }
-
   // ── Actions ──────────────────────────────────────────────────────────
 
   async onSubmit(): Promise<void> {
@@ -176,35 +170,25 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
       this.form.markAllAsTouched();
       return;
     }
+    if (!this.ticket) return;
 
-    const loading = await this.loadingCtrl.create({
-      message: 'Sending update...',
-    });
+    const loading = await this.loadingCtrl.create({ message: 'Sending update...' });
     await loading.present();
+
     this.isSubmitting = true;
-
     try {
-      const payload = this.buildPayload();
-      await this.ticketService.updateTicket(this.ticket!.publicId, payload);
+      const { priority, assignTo } = this.form.value;
 
-      const statusLabel =
-        this.statusOptions.find((s) => s.value === payload.status)?.label ?? payload.status;
+      await this.ticketService.assignPriority(this.ticket.publicId, priority);
 
-      const newMessage: TicketMessage = {
-        id: Date.now(),
-        content: `Status updated to: ${statusLabel}`,
-        sender: 'ADMIN',
-        timestamp: this.getCurrentTime(),
-      };
+      if (assignTo) {
+        await this.ticketService.assignTicket(this.ticket.publicId);
+        // ↑ passe assignTo se o service aceitar — verifique a assinatura
+      }
 
-      this.messages.push(newMessage);
-      this.saveMessages(); // ← persiste no localStorage
-
-      this.shouldScrollToBottom = true;
-      this.form.reset();
-      await this.showToast('Update sent successfully!', 'success');
+      await this.showToast('Ticket updated successfully.', 'success');
     } catch {
-      await this.showToast('Failed to send update. Please try again.', 'danger');
+      await this.showToast('Failed to update ticket. Please try again.', 'danger');
     } finally {
       this.isSubmitting = false;
       await loading.dismiss();
@@ -212,7 +196,6 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
   }
 
   async onCloseTicket(): Promise<void> {
-    // TODO: AlertController confirmation + ticketService.closeTicket()
     await this.showToast('Feature under development.', 'warning');
   }
 
@@ -228,7 +211,6 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
 
   private loadTicketData(): void {
     const publicId = this.route.snapshot.paramMap.get('publicId');
-
     if (!publicId) {
       this.showToast('Invalid ticket ID.', 'danger');
       return;
@@ -239,84 +221,18 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
     this.ticketService.findTicketById(publicId).subscribe({
       next: (data) => {
         this.ticket = data;
-
-        // Pré-popula o form com os valores atuais do ticket
         this.form.patchValue({
           status: data.status,
           priority: data.priority,
           assignTo: data.assignedTo ?? null,
         });
       },
-      error: () => {
-        this.showToast('Failed to load ticket data.', 'danger');
-      },
+      error: () => this.showToast('Failed to load ticket data.', 'danger'),
     });
 
-    this.messages = this.loadMessages();
+    // ✅ remova this.loadMessages() até implementar de verdade
+    // this.messages = [];
     this.shouldScrollToBottom = true;
-  }
-
-  private buildPayload(): TicketUpdatePayload {
-    const { status, priority, assignTo } = this.form.value;
-    return {
-      status,
-      priority: priority as TicketPriority,
-      ...(assignTo ? { assignTo } : {}),
-    };
-  }
-
-  // ── localStorage ─────────────────────────────────────────────────────
-
-  private storageKey(): string {
-    return `ticket_messages_${this.ticketPublicId}`;
-  }
-
-  private loadMessages(): TicketMessage[] {
-    try {
-      const stored = localStorage.getItem(this.storageKey());
-      if (stored) {
-        return JSON.parse(stored) as TicketMessage[];
-      }
-    } catch {
-      // JSON corrompido — ignora e usa as mensagens iniciais
-    }
-    return this.initialMessages();
-  }
-
-  private saveMessages(): void {
-    try {
-      localStorage.setItem(this.storageKey(), JSON.stringify(this.messages));
-    } catch {
-      // localStorage cheio ou indisponível — falha silenciosa
-    }
-  }
-
-  private initialMessages(): TicketMessage[] {
-    return [
-      {
-        id: 1,
-        content:
-          'SUPPORT TICKET - IT\n\nTitle: COMPUTER NOT TURNING ON\nType: New Ticket - IT\n\nREQUESTER INFO\nName: Ricardo Silva\nPhone: 08198189420\n\nPROBLEM DETAILS\nCategory: Computer & Peripherals\nSubcategory: Computer/Notebook failure\nFailure type: Does not turn on',
-        sender: 'USER',
-        timestamp: '09:15 AM',
-      },
-      {
-        id: 2,
-        content:
-          'Good morning, Ricardo. We are already reviewing your request with the engineering team. We will get back to you shortly.',
-        sender: 'ADMIN',
-        timestamp: '09:22 AM',
-      },
-    ];
-  }
-
-  // ── Utilities ────────────────────────────────────────────────────────
-
-  private getCurrentTime(): string {
-    return new Date().toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
   }
 
   private scrollToBottom(): void {
