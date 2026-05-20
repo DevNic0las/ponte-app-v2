@@ -36,8 +36,8 @@ export class DashboardHomePage {
   private readonly dashboardService = inject(DashboardService);
 
   readonly actionCards: ActionCard[] = [
-    { icon: 'ticket-outline', label: 'Atendimento', route: '/tickets/ticket-list' },
-    { icon: 'add-circle-outline', label: 'Criar Chamado', route: '/dashboard/ticket-create' },
+    { icon: 'ticket-outline', label: 'Atendimento', route: '/tickets/list' },
+    { icon: 'add-circle-outline', label: 'Criar Chamado', route: '/tickets/create' },
     { icon: 'person-outline', label: 'Perfil', route: '/profile' },
   ];
 

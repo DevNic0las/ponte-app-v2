@@ -1,0 +1,61 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="light">
+    <ion-title class="app-title">Ponte</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="page-content">
+
+
+  <div class="page-header">
+    <span class="label-novo-chamado">Novo Chamado</span>
+    <h1 class="page-title">MEU ATENDIMENTO</h1>
+  </div>
+
+  <div class="actions-container">
+
+    <ion-card class="action-card" button="true" (click)="goToTechnicalAnalysis()">
+      <ion-card-content>
+        <div class="card-inner">
+          <div class="icon-wrapper">
+            <ion-icon name="build-outline"></ion-icon>
+          </div>
+          <div class="card-text">
+            <h2 class="card-title">Análise Técnica</h2>
+            <p class="card-subtitle">Solicite suporte especializado para infraestrutura.</p>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="chevron-icon"></ion-icon>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="action-card" button="true" (click)="goToMyTickets()">
+      <ion-card-content>
+        <div class="card-inner">
+          <div class="icon-wrapper">
+            <ion-icon name="ticket-outline"></ion-icon>
+          </div>
+          <div class="card-text">
+            <h2 class="card-title">Meus Chamados</h2>
+            <p class="card-subtitle">Consulte o histórico e o status dos seus tickets.</p>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="chevron-icon"></ion-icon>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+
+  <div class="help-section">
+    <h3 class="help-title">Central de Ajuda</h3>
+    <p class="help-text">
+
+      Escolha a categoria que melhor descreve sua necessidade. O tempo médio de
+      resposta para chamados de nível crítico é de 2 horas úteis.
+    </p>
+  </div>
+
+</ion-content>
+
+
+<app-bottom-nav></app-bottom-nav>

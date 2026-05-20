@@ -9,7 +9,7 @@ export const routes: Routes = [
   },
   {
     path: 'home',
-    loadComponent: () => import('./features/home/user.menu.page').then((m) => m.UserMenuPage),
+    loadComponent: () => import('./features/home/pages/user.menu.page').then((m) => m.UserMenuPage),
     canActivate: [authGuard],
   },
   {
