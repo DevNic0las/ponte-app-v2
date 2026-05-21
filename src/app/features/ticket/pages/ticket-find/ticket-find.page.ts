@@ -112,7 +112,9 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
   private ticketPublicId = ''; // guardado para usar na chave do storage
 
   // ── Select options ───────────────────────────────────────────────────
-
+  public isUserMessage(message: TicketMessage): boolean {
+    return message.senderType === 'REQUESTER';
+  }
   readonly priorities: PriorityOption[] = [
     { label: 'Baixo', value: 'LOW' },
     { label: 'Médio', value: 'MEDIUM' },
@@ -179,11 +181,19 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
     try {
       const { priority, assignTo } = this.form.value;
 
-      await this.ticketService.assignPriority(this.ticket.publicId, priority);
-
+      await this.ticketService.assignPriority(this.ticket.publicId, priority).subscribe({
+        next: () => {
+          this.showToast('Priority updated successfully.', 'success');
+        },
+        error: () => this.showToast('Failed to update priority. Please try again.', 'danger'),
+      });
       if (assignTo) {
-        await this.ticketService.assignTicket(this.ticket.publicId);
-        // ↑ passe assignTo se o service aceitar — verifique a assinatura
+        await this.ticketService.assignTicket(this.ticket.publicId).subscribe({
+          next: () => {
+            this.showToast('Ticket assigned successfully.', 'success');
+          },
+          error: () => this.showToast('Failed to assign ticket. Please try again.', 'danger'),
+        });
       }
 
       await this.showToast('Ticket updated successfully.', 'success');
@@ -229,9 +239,17 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
       },
       error: () => this.showToast('Failed to load ticket data.', 'danger'),
     });
+    if (!this.ticket?.publicId) {
+      return;
+    }
 
-    // ✅ remova this.loadMessages() até implementar de verdade
-    // this.messages = [];
+    this.ticketService.getMessages(this.ticket?.publicId).subscribe({
+      next: (messages) => {
+        this.messages = messages;
+        this.shouldScrollToBottom = true;
+      },
+      error: () => this.showToast('Failed to load messages.', 'danger'),
+    });
     this.shouldScrollToBottom = true;
   }
 

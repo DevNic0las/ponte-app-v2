@@ -10,6 +10,7 @@ import {
   TicketResponse,
   TicketUpdatePayload,
 } from '../models/ticket.model';
+import { TicketMessage } from '../models/ticket-message.model';
 export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 @Injectable({
   providedIn: 'root',
@@ -43,9 +44,12 @@ export class TicketService {
   }
 
   assignPriority(id: string, priority: TicketPriority): Observable<TicketResponse> {
-    return this.http.patch<TicketResponse>(`${this.apiUrl}/tickets/${id}/assign/priority`, {
-      priority,
-    });
+    return this.http.patch<TicketResponse>(
+      `${this.apiUrl}/tickets/${id}/assign/priority?priority=${priority}`,
+      {
+        priority,
+      },
+    );
   }
 
   closeTicket(id: string): Observable<TicketResponse> {
@@ -67,5 +71,8 @@ export class TicketService {
   }
   getSectors(): Observable<Sector[]> {
     return this.http.get<Sector[]>(`${this.apiUrl}/sectors`);
+  }
+  getMessages(ticketId: string): Observable<TicketMessage[]> {
+    return this.http.get<TicketMessage[]>(`${this.apiUrl}/messages/${ticketId}`);
   }
 }
