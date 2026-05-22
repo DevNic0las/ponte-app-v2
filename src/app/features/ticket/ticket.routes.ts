@@ -11,7 +11,7 @@ export const TICKET_ROUTES: Routes = [
   {
     path: 'list',
     loadComponent: () =>
-      import('./pages/ticket-list/ticket-list.page').then((m) => m.TicketListPage),
+      import('./pages/ticket-list/ticket-list.page').then((m) => m.TicketManagementPage),
     canActivateChild: [authGuard],
   },
   {
