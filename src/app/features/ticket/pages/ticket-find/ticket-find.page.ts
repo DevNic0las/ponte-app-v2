@@ -108,6 +108,7 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
   messages: TicketMessage[] = [];
   assignTo: UserProfile[] = [];
   currentUserName = '';
+  currentUserPublicId = '';
   canManageTicket = false;
   isSubmitting = false;
   commentFocused = false;
@@ -182,7 +183,8 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
 
     try {
       const { priority, status, assignTo, comment } = this.form.value;
-
+      console.log('assignTo do form:', assignTo);
+      console.log('ticket.assignedTo:', this.ticket.assignedTo);
       // ─────────────────────────────────────────────
       // PRIORITY
       // ─────────────────────────────────────────────
@@ -207,12 +209,16 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
       // ASSIGN
       // ─────────────────────────────────────────────
 
-      if (assignTo && assignTo !== this.ticket.assignedTo) {
-        await firstValueFrom(this.ticketService.assignTicket(this.ticket.publicId));
+      if (assignTo && assignTo !== this.ticket.assignedTo?.publicId) {
+        await firstValueFrom(this.ticketService.assignTicket(this.ticket.publicId, assignTo));
 
-        this.ticket.assignedTo = assignTo;
+        this.ticket.assignedTo = this.assignTo.find((t) => t.publicId === assignTo) ?? undefined;
+
+        this.canManageTicket =
+          !this.ticket.assignedTo || this.ticket.assignedTo.publicId === this.currentUserPublicId;
+
+        this.updateFormState();
       }
-
       // ─────────────────────────────────────────────
       // MESSAGE
       // ─────────────────────────────────────────────
@@ -281,24 +287,30 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
       await this.showToast('User not authenticated.', 'danger');
       return;
     }
+
     const decoded = jwtDecode<JwtPayload>(currentUser);
     this.currentUserName = decoded.name;
+    this.currentUserPublicId = decoded.sub;
 
     this.ticketPublicId = publicId;
 
     this.ticketService.findTicketById(publicId).subscribe({
       next: (data) => {
         this.ticket = data;
-        this.canManageTicket = data.assignedTo?.name === this.currentUserName;
+
+        this.canManageTicket =
+          !data.assignedTo || data.assignedTo.publicId === this.currentUserPublicId;
+
         this.form.patchValue({
           status: data.status,
           priority: data.priority,
           assignTo: data.assignedTo ?? null,
         });
 
+        this.updateFormState();
+
         this.loadMessages(data.publicId);
       },
-
       error: () => {
         this.showToast('Failed to load ticket data.', 'danger');
       },
@@ -364,6 +376,19 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
       this.commentAreaRef.nativeElement.innerText = '';
     }
   }
+
+  private updateFormState(): void {
+    if (this.canManageTicket) {
+      this.form.get('status')?.enable();
+      this.form.get('priority')?.enable();
+      this.form.get('assignTo')?.enable();
+    } else {
+      this.form.get('status')?.disable();
+      this.form.get('priority')?.disable();
+      this.form.get('assignTo')?.disable();
+    }
+  }
+
   private loadMessages(ticketId: string): void {
     this.ticketService.getMessages(ticketId).subscribe({
       next: (messages) => {

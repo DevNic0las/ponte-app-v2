@@ -42,8 +42,11 @@ export class TicketService {
     return this.http.delete<TicketResponse>(`${this.apiUrl}/tickets/${id}`);
   }
 
-  assignTicket(id: string): Observable<TicketResponse> {
-    return this.http.patch<TicketResponse>(`${this.apiUrl}/tickets/${id}/assign`, null);
+  assignTicket(id: string, newUser: string): Observable<TicketResponse> {
+    return this.http.patch<TicketResponse>(
+      `${this.apiUrl}/tickets/${id}/assign?newUser=${newUser}`,
+      null,
+    );
   }
 
   assignPriority(id: string, priority: TicketPriority): Observable<TicketResponse> {
