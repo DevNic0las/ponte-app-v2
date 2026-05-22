@@ -1,127 +1,170 @@
 <!-- src/app/features/ticket/pages/ticket-find/ticket-find.page.html -->
 
 <ion-header class="ticket-header">
-
   <!-- Toolbar principal -->
   <ion-toolbar class="main-toolbar">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tickets" text=""></ion-back-button>
+      <ion-back-button
+        defaultHref="/tickets"
+        text=""
+      ></ion-back-button>
     </ion-buttons>
 
-    <ion-title class="chat-title" *ngIf="ticket">
+    <ion-title
+      class="chat-title"
+      *ngIf="ticket"
+    >
       Chamado #{{ ticket.publicId }}
     </ion-title>
-
-    <div slot="end" class="status-slot" *ngIf="ticket">
-      <span class="status-badge" [attr.data-status]="ticket.status">
-        {{ ticket.status | ticketStatus }}
-      </span>
-    </div>
   </ion-toolbar>
 
-  <!-- Segunda toolbar: assunto + meta -->
-  <ion-toolbar class="subtitle-toolbar" *ngIf="ticket">
+  <!-- Informações do chamado -->
+  <ion-toolbar
+    class="subtitle-toolbar"
+    *ngIf="ticket"
+  >
     <div class="ticket-meta">
-      <p class="ticket-subject">{{ ticket.title }}</p>
+      <p class="ticket-subject">
+        {{ ticket.title }}
+      </p>
+
       <div class="meta-row">
         <span class="meta-item">
           <ion-icon name="calendar-outline"></ion-icon>
+
           {{ ticket.createdAt | date: 'dd MMM, yyyy' }}
         </span>
+
         <span class="meta-item">
           <ion-icon name="person-outline"></ion-icon>
+
           {{ ticket.requestedBy?.name ?? '—' }}
         </span>
       </div>
     </div>
   </ion-toolbar>
-
 </ion-header>
 
-<!-- ── Histórico do chat ──────────────────────────────────────────── -->
-<ion-content #chatContent class="chat-content">
+<!-- Histórico -->
+<ion-content
+  #chatContent
+  class="chat-content"
+>
   <div class="messages-wrapper">
-
     <div class="chat-divider">
-      <span class="divider-label">Início do atendimento</span>
+      <span class="divider-label">
+        Início do atendimento
+      </span>
     </div>
 
     <ng-container *ngFor="let msg of messages">
 
-      <!-- Mensagem do usuário (esquerda) -->
-      <div class="message-row user-row" *ngIf="isUserMessage(msg)">
+      <!-- Usuário -->
+      <div
+        class="message-row user-row"
+        *ngIf="isUserMessage(msg)"
+      >
         <div class="bubble bubble-user">
-          <p class="bubble-text">{{ msg.content }}</p>
+          <p class="bubble-text">
+            {{ msg.content }}
+          </p>
         </div>
-        <span class="bubble-time">{{ msg.createdAt }}</span>
+
+        <span class="bubble-time">
+          {{ msg.createdAt }}
+        </span>
       </div>
 
-      <!-- Mensagem do admin (direita) -->
-      <div class="message-row admin-row" *ngIf="!isUserMessage(msg)">
+      <!-- Técnico -->
+      <div
+        class="message-row admin-row"
+        *ngIf="!isUserMessage(msg)"
+      >
         <div class="bubble bubble-admin">
-          <p class="bubble-text">{{ msg.content }}</p>
+          <p class="bubble-text">
+            {{ msg.content }}
+          </p>
         </div>
-        <span class="bubble-time bubble-time-right">{{ msg.createdAt }}</span>
+
+        <span class="bubble-time bubble-time-right">
+          {{ msg.createdAt }}
+        </span>
       </div>
 
     </ng-container>
-
   </div>
 </ion-content>
 
-<!-- ── Painel administrativo ─────────────────────────────────────── -->
+<!-- Painel -->
 <ion-footer class="admin-footer">
   <div class="admin-panel">
 
-    <p class="panel-title">Painel Administrativo</p>
+    <p class="panel-title">
+      Painel Administrativo
+    </p>
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <form
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()"
+    >
 
+      <!-- SELECTS -->
       <ion-grid class="ion-no-padding">
         <ion-row class="selects-row">
 
-          <!-- Atribuir tarefa -->
+          <!-- ATRIBUIR -->
           <ion-col>
             <div class="field-group">
-              <label class="field-label">ATRIBUIR TAREFA</label>
+
+              <label class="field-label">
+                ATRIBUIR TAREFA
+              </label>
+
               <ion-item
                 lines="none"
                 class="select-item"
-                [class.invalid]="form.get('assignTo')?.invalid && form.get('assignTo')?.touched"
               >
+
+                <!-- Já atribuído -->
+                <span *ngIf="ticket?.assignedTo">
+                  {{currentUserName}}
+                </span>
+
+                <!-- Ainda não atribuído -->
                 <ion-select
+                  *ngIf="!ticket?.assignedTo"
                   formControlName="assignTo"
-                  placeholder="Selecionar equipe..."
+                  placeholder="Selecionar técnico..."
                   interface="action-sheet"
                   cancelText="Cancelar"
                 >
                   <ion-select-option
-                    *ngFor="let option of assignOptions"
-                    [value]="option.value"
+                    *ngFor="let option of assignTo"
+                    [value]="option.name"
                   >
-                    {{ option.label }}
+                    {{ option.name }}
                   </ion-select-option>
                 </ion-select>
+
               </ion-item>
-              <ion-note
-                color="danger"
-                *ngIf="form.get('assignTo')?.invalid && form.get('assignTo')?.touched"
-              >
-                Campo obrigatório
-              </ion-note>
+
             </div>
           </ion-col>
 
-          <!-- Atualização de status -->
+          <!-- STATUS -->
           <ion-col>
             <div class="field-group">
-              <label class="field-label">ATUALIZAR STATUS</label>
+
+              <label class="field-label">
+                ATUALIZAR STATUS
+              </label>
+
               <ion-item
                 lines="none"
                 class="select-item"
-                [class.invalid]="form.get('status')?.invalid && form.get('status')?.touched"
               >
                 <ion-select
+                  [disabled]="!canManageTicket"
                   formControlName="status"
                   placeholder="Selecionar status..."
                   interface="action-sheet"
@@ -135,27 +178,26 @@
                   </ion-select-option>
                 </ion-select>
               </ion-item>
-              <ion-note
-                color="danger"
-                *ngIf="form.get('status')?.invalid && form.get('status')?.touched"
-              >
-                Campo obrigatório
-              </ion-note>
+
             </div>
           </ion-col>
 
         </ion-row>
       </ion-grid>
 
-      <!-- Prioridade -->
+      <!-- PRIORIDADE -->
       <div class="field-group">
-        <label class="field-label">PRIORIDADE</label>
+
+        <label class="field-label">
+          PRIORIDADE
+        </label>
+
         <ion-item
           lines="none"
           class="select-item"
-          [class.invalid]="form.get('priority')?.invalid && form.get('priority')?.touched"
         >
           <ion-select
+            [disabled]="!canManageTicket"
             formControlName="priority"
             placeholder="Selecionar prioridade..."
             interface="action-sheet"
@@ -169,23 +211,61 @@
             </ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-note
-          color="danger"
-          *ngIf="form.get('priority')?.invalid && form.get('priority')?.touched"
-        >
-          Campo obrigatório
-        </ion-note>
+
       </div>
 
-      <!-- Botões de ação -->
+      <!-- COMENTÁRIO -->
+      <div class="field-group">
+
+        <label class="field-label">
+          COMENTÁRIO INTERNO
+        </label>
+
+        <div class="comment-area-wrapper">
+
+          <div
+            class="comment-area"
+            [attr.contenteditable]="canManageTicket"
+            data-placeholder="Adicione uma nota interna sobre este chamado..."
+            (input)="onCommentInput($event)"
+            (focus)="commentFocused = true"
+            (blur)="commentFocused = false"
+            [class.focused]="commentFocused"
+          ></div>
+
+          <div class="comment-footer-bar">
+
+            <span class="comment-hint">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+
+              Visível apenas para administradores
+            </span>
+
+            <span
+              class="comment-counter"
+              [class.over-limit]="commentLength > 500"
+            >
+              {{ commentLength }}/500
+            </span>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTÕES -->
       <div class="action-buttons">
+
         <ion-button
           expand="block"
           type="submit"
           class="btn-submit"
-          [disabled]="isSubmitting"
+          [disabled]="isSubmitting || !canManageTicket"
         >
-          <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+          <ion-icon
+            name="checkmark-circle-outline"
+            slot="start"
+          ></ion-icon>
+
           ENVIAR ATUALIZAÇÃO
         </ion-button>
 
@@ -194,11 +274,17 @@
           fill="outline"
           class="btn-close"
           type="button"
+          [disabled]="!canManageTicket"
           (click)="onCloseTicket()"
         >
-          <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+          <ion-icon
+            name="close-circle-outline"
+            slot="start"
+          ></ion-icon>
+
           ENCERRAR CHAMADO
         </ion-button>
+
       </div>
 
     </form>

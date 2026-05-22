@@ -8,10 +8,13 @@ import {
   Subcategory,
   TicketRequest,
   TicketResponse,
+  TicketStatus,
   TicketUpdatePayload,
 } from '../models/ticket.model';
 import { TicketMessage } from '../models/ticket-message.model';
+import { UserProfile } from '../../profile/models/profile.model';
 export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+type SenderType = 'REQUESTER' | 'TECHNICIAN';
 @Injectable({
   providedIn: 'root',
 })
@@ -51,6 +54,14 @@ export class TicketService {
       },
     );
   }
+  assignStatus(ticketId: string, status: TicketStatus): Observable<TicketResponse> {
+    return this.http.patch<TicketResponse>(
+      `${this.apiUrl}/tickets/${ticketId}/assign/status?status=${status}`,
+      {
+        status,
+      },
+    );
+  }
 
   closeTicket(id: string): Observable<TicketResponse> {
     return this.http.patch<TicketResponse>(`${this.apiUrl}/tickets/${id}/close`, null);
@@ -74,5 +85,13 @@ export class TicketService {
   }
   getMessages(ticketId: string): Observable<TicketMessage[]> {
     return this.http.get<TicketMessage[]>(`${this.apiUrl}/messages/${ticketId}`);
+  }
+  sendMessage(ticketId: string, content: string): Observable<TicketMessage> {
+    return this.http.post<TicketMessage>(`${this.apiUrl}/messages/${ticketId}`, {
+      content,
+    });
+  }
+  getTechnicians(): Observable<UserProfile[]> {
+    return this.http.get<UserProfile[]>(`${this.apiUrl}/users/technicians`);
   }
 }

@@ -1,21 +1,11 @@
 // src/app/features/ticket/ticket-find/ticket-find.page.ts
 
-import {
-  Component,
-  OnInit,
-  AfterViewChecked, // ← adicionado
-  ViewChild, // ← adicionado
-  inject,
-} from '@angular/core';
+import { Component, OnInit, AfterViewChecked, ViewChild, inject, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormsModule,
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+import { jwtDecode } from 'jwt-decode';
 import {
   IonContent,
   IonHeader,
@@ -29,29 +19,30 @@ import {
   IonBackButton,
   IonButtons,
   IonBadge,
-  IonButton, // ← adicionado
-  IonIcon, // ← adicionado
-  IonFooter, // ← adicionado (usado no template)
-  IonGrid, // ← adicionado (usado no template)
-  IonRow, // ← adicionado (usado no template)
-  IonCol, // ← adicionado (usado no template)
+  IonButton,
+  IonIcon,
+  IonFooter,
+  IonGrid,
+  IonRow,
+  IonCol,
   LoadingController,
   ToastController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   calendarOutline,
-  personOutline, // ← adicionado
+  personOutline,
   checkmarkCircleOutline,
-  closeCircleOutline, // ← adicionado
+  closeCircleOutline,
+  lockClosedOutline, // ← adicionado para o ícone do comment-hint
 } from 'ionicons/icons';
 
 import { TicketService } from '../../services/ticket.service';
 import { TicketPriority, TicketResponse } from '../../models/ticket.model';
 import { TicketMessage } from '../../models/ticket-message.model';
 import { TicketStatusPipe, TicketStatusColorPipe } from '../../pipe/ticket-status.pipe';
-
-// ── Tipos locais ─────────────────────────────────────────────────────
+import { TokenStorageService } from '../../../../core/storage/token-storage.service';
+import { UserProfile } from 'src/app/features/profile/models/profile.model';
 interface SelectOption {
   label: string;
   value: string;
@@ -61,6 +52,14 @@ interface PriorityOption {
   label: string;
   value: TicketPriority;
 }
+
+interface JwtPayload {
+  sub: string;
+  name: string;
+  role: string;
+  exp: number;
+}
+export type SenderType = 'REQUESTER' | 'TECHNICIAN';
 
 @Component({
   selector: 'app-ticket-find',
@@ -85,12 +84,12 @@ interface PriorityOption {
     IonBadge,
     TicketStatusPipe,
     TicketStatusColorPipe,
-    IonButton, // ← adicionado
-    IonIcon, // ← adicionado
-    IonFooter, // ← adicionado
-    IonGrid, // ← adicionado
-    IonRow, // ← adicionado
-    IonCol, // ← adicionado
+    IonButton,
+    IonIcon,
+    IonFooter,
+    IonGrid,
+    IonRow,
+    IonCol,
   ],
 })
 export class TicketFindPage implements OnInit, AfterViewChecked {
@@ -100,21 +99,28 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
   private readonly ticketService = inject(TicketService);
   private readonly loadingCtrl = inject(LoadingController);
   private readonly toastCtrl = inject(ToastController);
-
+  private readonly tokenStorage = inject(TokenStorageService);
   // ── ViewChild ────────────────────────────────────────────────────────
   @ViewChild('chatContent') private chatContent!: IonContent;
-
+  @ViewChild('commentArea') private commentAreaRef!: ElementRef<HTMLElement>;
   // ── State ────────────────────────────────────────────────────────────
   ticket: TicketResponse | null = null;
   messages: TicketMessage[] = [];
+  assignTo: UserProfile[] = [];
+  currentUserName = '';
+  canManageTicket = false;
   isSubmitting = false;
+  commentFocused = false;
+  commentLength = 0;
+
   private shouldScrollToBottom = false;
-  private ticketPublicId = ''; // guardado para usar na chave do storage
+  private ticketPublicId = '';
 
   // ── Select options ───────────────────────────────────────────────────
   public isUserMessage(message: TicketMessage): boolean {
     return message.senderType === 'REQUESTER';
   }
+
   readonly priorities: PriorityOption[] = [
     { label: 'Baixo', value: 'LOW' },
     { label: 'Médio', value: 'MEDIUM' },
@@ -122,20 +128,9 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
     { label: 'Crítico', value: 'CRITICAL' },
   ];
 
-  readonly assignOptions: SelectOption[] = [
-    { label: 'Level 2 Support', value: 'SUPPORT_L2' },
-    { label: 'Backend Development', value: 'DEV_BACKEND' },
-    { label: 'Infrastructure', value: 'INFRA' },
-    { label: 'Financial', value: 'FINANCIAL' },
-    { label: 'Hardware Analysis', value: 'HARDWARE_ANALYSIS' },
-    { label: 'Network Analysis', value: 'NETWORK_ANALYSIS' },
-    { label: 'On-site Visit', value: 'ONSITE_VISIT' },
-  ];
-
   readonly statusOptions: SelectOption[] = [
     { label: 'Aberto', value: 'OPEN' },
     { label: 'Em Andamento', value: 'IN_PROGRESS' },
-    { label: 'Em Análise', value: 'IN_ANALYSIS' },
     { label: 'Fechado', value: 'CLOSED' },
   ];
 
@@ -148,6 +143,7 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
       personOutline,
       checkmarkCircleOutline,
       closeCircleOutline,
+      lockClosedOutline,
     });
   }
 
@@ -156,6 +152,7 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
   ngOnInit(): void {
     this.buildForm();
     this.loadTicketData();
+    this.loadTechnicians();
   }
 
   ngAfterViewChecked(): void {
@@ -172,35 +169,78 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
       this.form.markAllAsTouched();
       return;
     }
+
     if (!this.ticket) return;
 
-    const loading = await this.loadingCtrl.create({ message: 'Sending update...' });
+    const loading = await this.loadingCtrl.create({
+      message: 'Sending update...',
+    });
+
     await loading.present();
 
     this.isSubmitting = true;
-    try {
-      const { priority, assignTo } = this.form.value;
 
-      await this.ticketService.assignPriority(this.ticket.publicId, priority).subscribe({
-        next: () => {
-          this.showToast('Priority updated successfully.', 'success');
-        },
-        error: () => this.showToast('Failed to update priority. Please try again.', 'danger'),
-      });
-      if (assignTo) {
-        await this.ticketService.assignTicket(this.ticket.publicId).subscribe({
-          next: () => {
-            this.showToast('Ticket assigned successfully.', 'success');
-          },
-          error: () => this.showToast('Failed to assign ticket. Please try again.', 'danger'),
-        });
+    try {
+      const { priority, status, assignTo, comment } = this.form.value;
+
+      // ─────────────────────────────────────────────
+      // PRIORITY
+      // ─────────────────────────────────────────────
+
+      if (priority && priority !== this.ticket.priority) {
+        await firstValueFrom(this.ticketService.assignPriority(this.ticket.publicId, priority));
+
+        this.ticket.priority = priority;
+      }
+
+      // ─────────────────────────────────────────────
+      // STATUS
+      // ─────────────────────────────────────────────
+
+      if (status && status !== this.ticket.status) {
+        await firstValueFrom(this.ticketService.assignStatus(this.ticket.publicId, status));
+
+        this.ticket.status = status;
+      }
+
+      // ─────────────────────────────────────────────
+      // ASSIGN
+      // ─────────────────────────────────────────────
+
+      if (assignTo && assignTo !== this.ticket.assignedTo) {
+        await firstValueFrom(this.ticketService.assignTicket(this.ticket.publicId));
+
+        this.ticket.assignedTo = assignTo;
+      }
+
+      // ─────────────────────────────────────────────
+      // MESSAGE
+      // ─────────────────────────────────────────────
+
+      if (comment?.trim()) {
+        const msg = await firstValueFrom(
+          this.ticketService.sendMessage(this.ticket.publicId, comment),
+        );
+
+        this.messages = [...this.messages, msg];
+
+        this.form.get('comment')?.setValue('');
+
+        this.commentLength = 0;
+
+        this.clearCommentArea();
+
+        this.shouldScrollToBottom = true;
       }
 
       await this.showToast('Ticket updated successfully.', 'success');
-    } catch {
-      await this.showToast('Failed to update ticket. Please try again.', 'danger');
+    } catch (error) {
+      console.error(error);
+
+      await this.showToast('Failed to update ticket.', 'danger');
     } finally {
       this.isSubmitting = false;
+
       await loading.dismiss();
     }
   }
@@ -209,48 +249,64 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
     await this.showToast('Feature under development.', 'warning');
   }
 
+  onCommentInput(event: Event): void {
+    // ← movido para dentro da classe
+    const el = event.target as HTMLElement;
+    const text = el.innerText ?? '';
+    this.commentLength = text.length;
+    this.form.get('comment')?.setValue(text);
+  }
+
   // ── Private ──────────────────────────────────────────────────────────
 
   private buildForm(): void {
     this.form = this.fb.group({
-      status: [null, Validators.required],
-      priority: [null, Validators.required],
-      assignTo: [null], // optional per TicketUpdatePayload
+      status: [null],
+      priority: [null],
+      assignTo: [null],
+      comment: [''],
     });
   }
-
-  private loadTicketData(): void {
+  private async loadTicketData(): Promise<void> {
     const publicId = this.route.snapshot.paramMap.get('publicId');
+
     if (!publicId) {
-      this.showToast('Invalid ticket ID.', 'danger');
+      await this.showToast('Invalid ticket ID.', 'danger');
       return;
     }
+
+    const currentUser = await this.tokenStorage.getToken();
+
+    if (!currentUser) {
+      await this.showToast('User not authenticated.', 'danger');
+      return;
+    }
+    const decoded = jwtDecode<JwtPayload>(currentUser);
+    this.currentUserName = decoded.name;
 
     this.ticketPublicId = publicId;
 
     this.ticketService.findTicketById(publicId).subscribe({
       next: (data) => {
         this.ticket = data;
+        this.canManageTicket = data.assignedTo?.name === this.currentUserName;
         this.form.patchValue({
           status: data.status,
           priority: data.priority,
           assignTo: data.assignedTo ?? null,
         });
-      },
-      error: () => this.showToast('Failed to load ticket data.', 'danger'),
-    });
-    if (!this.ticket?.publicId) {
-      return;
-    }
 
-    this.ticketService.getMessages(this.ticket?.publicId).subscribe({
-      next: (messages) => {
-        this.messages = messages;
-        this.shouldScrollToBottom = true;
+        this.loadMessages(data.publicId);
       },
-      error: () => this.showToast('Failed to load messages.', 'danger'),
+
+      error: () => {
+        this.showToast('Failed to load ticket data.', 'danger');
+      },
     });
-    this.shouldScrollToBottom = true;
+  }
+
+  private async loadTechnicians(): Promise<void> {
+    this.assignTo = await firstValueFrom(this.ticketService.getTechnicians());
   }
 
   private scrollToBottom(): void {
@@ -265,5 +321,59 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
       position: 'top',
     });
     await toast.present();
+  }
+
+  async sendMessageTicket(): Promise<void> {
+    const comment = this.form.get('comment')?.value?.trim();
+
+    if (!comment) {
+      await this.showToast('Escreva uma mensagem antes de enviar.', 'warning');
+      return;
+    }
+
+    if (!this.ticket) return;
+
+    const token = await this.tokenStorage.getToken();
+    if (!token) {
+      await this.showToast('User not authenticated.', 'danger');
+      return;
+    }
+
+    const loading = await this.loadingCtrl.create({ message: 'Enviando mensagem...' });
+    await loading.present();
+
+    this.ticketService.sendMessage(this.ticket.publicId, comment).subscribe({
+      next: (msg) => {
+        this.messages = [...this.messages, msg];
+        this.form.get('comment')?.setValue('');
+        this.commentLength = 0;
+        this.clearCommentArea();
+        this.shouldScrollToBottom = true;
+        loading.dismiss();
+        this.showToast('Mensagem enviada.', 'success');
+      },
+      error: () => {
+        loading.dismiss();
+        this.showToast('Falha ao enviar mensagem.', 'danger');
+      },
+    });
+  }
+
+  private clearCommentArea(): void {
+    if (this.commentAreaRef?.nativeElement) {
+      this.commentAreaRef.nativeElement.innerText = '';
+    }
+  }
+  private loadMessages(ticketId: string): void {
+    this.ticketService.getMessages(ticketId).subscribe({
+      next: (messages) => {
+        this.messages = messages;
+        this.shouldScrollToBottom = true;
+      },
+
+      error: () => {
+        this.showToast('Failed to load messages.', 'danger');
+      },
+    });
   }
 }
