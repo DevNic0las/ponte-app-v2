@@ -3,4 +3,5 @@ export interface TicketCard {
   title: string;
   subtitle: string;
   route: string;
+  queryParams?: Record<string, string>;
 }
