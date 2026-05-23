@@ -1,92 +1,70 @@
-// features/ticket/pages/ticket-list/ticket-list.page.ts
-
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { arrowBack, search, home, ticket, barChart, person } from 'ionicons/icons';
-import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonButtons,
-  IonButton,
-  IonIcon,
-  IonContent,
-  IonFooter,
-  IonTabBar,
-  IonTabButton,
-  IonLabel,
-  IonSpinner,
-} from '@ionic/angular/standalone';
+import { arrowBackOutline, optionsOutline, chevronDownOutline, homeOutline, receiptOutline, personOutline } from 'ionicons/icons';
 
-import { TicketService } from '../../services/ticket.service';
-import { TicketResponse } from '../../models/ticket.model';
-import { TicketListCardComponent } from '../../../../shared/components/ticket-list-card/ticket-list-card.component';
-import { BottomNavComponent } from 'src/app/shared/components/bottom-nav/bottom-nav.component';
+interface Chamado {
+  id: number;
+  titulo: string;
+  descricao: string;
+  status: 'novo' | 'atendimento' | 'planejado';
+  statusLabel: string;
+  usuarioNome: string;
+  usuarioIniciais: string;
+  data: string;
+}
+
 @Component({
-  selector: 'app-ticket-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonButtons,
-    IonButton,
-    IonIcon,
-    IonContent,
-    IonFooter,
-    IonTabBar,
-    IonTabButton,
-    IonLabel,
-    IonSpinner,
-    TicketListCardComponent,
-    BottomNavComponent,
-  ],
+  selector: 'app-ticket-management',
   templateUrl: './ticket-list.page.html',
   styleUrls: ['./ticket-list.page.scss'],
+  standalone: true,
+  imports: [IonicModule, CommonModule]
 })
-export class TicketListPage implements OnInit {
-  private readonly ticketService = inject(TicketService);
-  private readonly routerLink = inject(Router);
-  tickets = signal<TicketResponse[]>([]);
-  isLoading = signal(true);
-  error = signal<string | null>(null);
+export class TicketManagementPage implements OnInit {
+  filtroAtual: string = 'todos';
+  
+  chamados: Chamado[] = [
+    {
+      id: 1,
+      titulo: 'COMPUTADOR SEM LIGAR',
+      descricao: 'Computador não liga, já tentei de tudo e o mesmo não quer ligar',
+      status: 'novo',
+      statusLabel: 'Novos Chamados',
+      usuarioNome: 'Ricardo Mendonça',
+      usuarioIniciais: 'RM',
+      data: '10/10/2023 • 09:45'
+    }
+  ];
+
+  chamadosFiltrados: Chamado[] = [];
 
   constructor() {
-    addIcons({ arrowBack, search, home, ticket, barChart, person });
-  }
-
-  ngOnInit(): void {
-    this.ticketService.listTickets().subscribe({
-      next: (data) => console.log('status do primeiro ticket:', data[0]?.status),
-    });
-    this.loadTickets();
-  }
-
-  public loadTickets(): void {
-    this.isLoading.set(true);
-    this.error.set(null);
-
-    this.ticketService.listTickets().subscribe({
-      next: (data) => {
-        this.tickets.set(data);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        console.error('Erro ao carregar chamados:', err);
-        this.error.set('Não foi possível carregar os chamados. Tente novamente.');
-        this.isLoading.set(false);
-      },
+    addIcons({
+      'arrow-back-outline': arrowBackOutline,
+      'options-outline': optionsOutline,
+      'chevron-down-outline': chevronDownOutline,
+      'home-outline': homeOutline,
+      'receipt-outline': receiptOutline,
+      'person-outline': personOutline
     });
   }
 
-  trackByTicketId(_index: number, ticket: TicketResponse): string {
-    return ticket.publicId;
+  ngOnInit() {
+    this.filtrarChamados('todos');
   }
-  onTicketSelected(ticket: TicketResponse): void {
-    this.routerLink.navigate(['/tickets/find', ticket.publicId]);
+
+  filtrarChamados(status: string) {
+    this.filtroAtual = status;
+    if (status === 'todos') {
+      this.chamadosFiltrados = [...this.chamados];
+    } else {
+      this.chamadosFiltrados = this.chamados.filter(c => c.status === status);
+    }
+  }
+
+  limparFiltros() {
+    this.filtrarChamados('todos');
   }
 }

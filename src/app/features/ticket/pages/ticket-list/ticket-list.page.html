@@ -1,61 +1,94 @@
-<!-- ticket-list.page.html -->
-
-<ion-header>
-  <ion-toolbar>
+<ion-header class="ion-no-border">
+  <ion-toolbar color="light">
     <ion-buttons slot="start">
-      <ion-button routerLink="/dashboard">
-        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      <ion-button class="btn-back">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
-
-    <ion-title>Atendimento</ion-title>
-
-    <ion-buttons slot="end">
-      <ion-button>
-        <ion-icon slot="icon-only" name="search"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+    <ion-title class="ion-text-center">ATENDIMENTO</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="ticket-list-page">
-    <!-- Cabeçalho editorial -->
-    <div class="ticket-list-page__editorial">
-      <span class="ticket-list-page__eyebrow">VISÃO GERAL</span>
-      <h2 class="ticket-list-page__heading">Gerenciamento de Chamados</h2>
-      <p class="ticket-list-page__subheading">
-        Acompanhe e responda às solicitações ativas da plataforma.
-      </p>
-    </div>
-
-    <!-- Estado: loading -->
-    @if (isLoading()) {
-    <div class="ticket-list-page__center">
-      <ion-spinner name="crescent" color="primary"></ion-spinner>
-    </div>
-    }
-
-    <!-- Estado: erro -->
-    @if (error()) {
-    <div class="ticket-list-page__center ticket-list-page__center--error">
-      <ion-icon name="alert-circle-outline"></ion-icon>
-      <p>{{ error() }}</p>
-      <ion-button fill="outline" color="primary" (click)="loadTickets()">
-        Tentar novamente
+<ion-content class="ion-padding">
+  <div class="editorial-header">
+    <span class="subtitle">VISÃO GERAL</span>
+    <h2 class="title">Gerenciamento de Chamados</h2>
+    <p class="description">Acompanhe e responda às solicitações ativas da plataforma.</p>
+    
+    <div class="filter-container">
+      <ion-button fill="outline" id="trigger-filter" class="btn-filter">
+        <ion-icon slot="start" name="options-outline"></ion-icon>
+        Filtrar
+        <ion-icon slot="end" name="chevron-down-outline"></ion-icon>
       </ion-button>
-    </div>
-    }
 
-    <!-- Lista de cards -->
-    @if (!isLoading() && !error()) {
-    <div class="ticket-list-page__list">
-      @for (ticket of tickets(); track trackByTicketId($index, ticket)) {
-      <app-ticket-list-card [ticket]="ticket" (ticketClick)="onTicketSelected($event)" />
-      }
+      <ion-popover trigger="trigger-filter" dismissOnSelect="true">
+        <ng-template>
+          <ion-content class="popover-content">
+            <div class="popover-header">Filtrar por Status</div>
+            <ion-list lines="none">
+              <ion-item button (click)="filtrarChamados('novo')">
+                <span class="dot bg-novo"></span>
+                <ion-label>Novos Chamados</ion-label>
+              </ion-item>
+              <ion-item button (click)="filtrarChamados('atendimento')">
+                <span class="dot bg-atendimento"></span>
+                <ion-label>Chamados em Atendimento</ion-label>
+              </ion-item>
+              <ion-item button (click)="filtrarChamados('planejado')">
+                <span class="dot bg-planejado"></span>
+                <ion-label>Chamados Planejados</ion-label>
+              </ion-item>
+              <div class="divider"></div>
+              <ion-button fill="clear" expand="block" (click)="limparFiltros()" class="btn-clear-filter">
+                Limpar Filtros
+              </ion-button>
+            </ion-list>
+          </ion-content>
+        </ng-template>
+      </ion-popover>
     </div>
-    }
+  </div>
+
+  <div class="ticket-list">
+    <div *ngFor="let chamado of chamadosFiltrados" class="ticket-card" [ngClass]="'status-' + chamado.status">
+      <div class="status-indicator"></div>
+      <div class="card-body">
+        <div class="card-header">
+          <span class="badge" [ngClass]="'badge-' + chamado.status">{{ chamado.statusLabel }}</span>
+        </div>
+        <h3 class="ticket-title">{{ chamado.titulo }}</h3>
+        <p class="ticket-description">{{ chamado.descricao }}</p>
+        
+        <div class="card-footer">
+          <div class="user-info">
+            <div class="avatar">
+              <span>{{ chamado.usuarioIniciais }}</span>
+            </div>
+            <span class="username">{{ chamado.usuarioNome }}</span>
+          </div>
+          <span class="ticket-date">{{ chamado.data }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 </ion-content>
 
- <app-bottom-nav></app-bottom-nav> 
+<ion-footer class="ion-no-border">
+  <ion-tab-bar slot="bottom" class="custom-tab-bar">
+    <ion-tab-button tab="home">
+      <ion-icon name="home-outline"></ion-icon>
+      <ion-label>INÍCIO</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="atendimento" class="tab-active">
+      <ion-icon name="receipt-outline"></ion-icon>
+      <ion-label>ATENDIMENTO</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="perfil">
+      <ion-icon name="person-outline"></ion-icon>
+      <ion-label>PERFIL</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-footer>
