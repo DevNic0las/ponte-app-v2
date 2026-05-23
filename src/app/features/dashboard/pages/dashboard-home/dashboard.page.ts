@@ -80,8 +80,6 @@ export class DashboardHomePage {
   );
 
   onActionCardClick(card: ActionCard): void {
-    console.log(card.route);
-    
     this.router.navigate([card.route]);
   }
 
