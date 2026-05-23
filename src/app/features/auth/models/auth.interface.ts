@@ -10,6 +10,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   role: UserRole;
+  sector: string;
 }
 
 export interface LoginResponse {
@@ -23,4 +24,5 @@ export interface RegisterResponse {
   name: string;
   email: string;
   role: UserRole;
+  sector: string;
 }

@@ -1,0 +1,99 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Novo Usuário</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="editorial-header">
+    <span class="section-tag">Administração de Acesso</span>
+    <h1 class="page-title">Configurar credenciais</h1>
+    <p class="page-subtitle">
+      Preencha os dados abaixo para habilitar o acesso do novo colaborador.
+    </p>
+  </div>
+
+  <form [formGroup]="registerForm" class="form-card">
+
+    <ion-input
+      fill="outline"
+      label="Nome Completo"
+      labelPlacement="floating"
+      formControlName="name"
+      placeholder="Ex: Roberto Alencar Silva"
+      autocomplete="name"
+      class="ion-margin-bottom"
+    ></ion-input>
+    <span class="field-error" *ngIf="isFieldInvalid('name')">Nome é obrigatório</span>
+
+    <ion-input
+      fill="outline"
+      label="E-mail Corporativo"
+      labelPlacement="floating"
+      formControlName="email"
+      type="email"
+      placeholder="roberto.silva@empresa.com.br"
+      inputmode="email"
+      autocomplete="email"
+      class="ion-margin-bottom"
+    ></ion-input>
+    <span class="field-error" *ngIf="isFieldInvalid('email')">E-mail inválido</span>
+
+    <ion-select
+      fill="outline"
+      label="Setor"
+      labelPlacement="floating"
+      formControlName="sector"
+      placeholder="Selecione o setor"
+      class="ion-margin-bottom"
+    >
+      <ion-select-option *ngFor="let sector of sectors" [value]="sector.publicId">
+        {{ sector.name }}
+      </ion-select-option>
+    </ion-select>
+    <span class="field-error" *ngIf="isFieldInvalid('sector')">Setor é obrigatório</span>
+
+    <ion-select
+      fill="outline"
+      label="Perfil de Acesso"
+      labelPlacement="floating"
+      formControlName="role"
+      placeholder="Selecione o perfil"
+      class="ion-margin-bottom"
+    >
+      <ion-select-option value="TECHNICIAN">Técnico</ion-select-option>
+      <ion-select-option value="REQUESTER">Solicitante</ion-select-option>
+    </ion-select>
+    <span class="field-error" *ngIf="isFieldInvalid('role')">Perfil é obrigatório</span>
+
+    <ion-input
+      fill="outline"
+      label="Senha Provisória"
+      labelPlacement="floating"
+      formControlName="password"
+      [type]="showPassword() ? 'text' : 'password'"
+      placeholder="••••••••"
+      autocomplete="new-password"
+      class="ion-margin-bottom"
+    >
+      <ion-button slot="end" fill="clear" (click)="togglePasswordVisibility()">
+        <ion-icon [name]="showPassword() ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
+      </ion-button>
+    </ion-input>
+    <p class="field-hint">O usuário deverá alterar esta senha no primeiro login.</p>
+    <span class="field-error" *ngIf="isFieldInvalid('password')">Senha é obrigatória</span>
+
+    <div class="actions">
+      <ion-button expand="block" (click)="onSubmit()" [disabled]="isLoading">
+        {{ isLoading ? 'Cadastrando...' : 'Cadastrar Usuário' }}
+      </ion-button>
+      <ion-button expand="block" fill="outline" (click)="router.navigate(['/dashboard'])">
+        Cancelar
+      </ion-button>
+    </div>
+
+  </form>
+</ion-content>
