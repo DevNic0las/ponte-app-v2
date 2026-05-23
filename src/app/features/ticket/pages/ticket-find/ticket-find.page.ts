@@ -36,7 +36,7 @@ import {
   closeCircleOutline,
   lockClosedOutline, // ← adicionado para o ícone do comment-hint
 } from 'ionicons/icons';
-
+import { ChangeDetectorRef } from '@angular/core';
 import { TicketService } from '../../services/ticket.service';
 import { TicketPriority, TicketResponse } from '../../models/ticket.model';
 import { TicketMessage } from '../../models/ticket-message.model';
@@ -100,6 +100,7 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
   private readonly loadingCtrl = inject(LoadingController);
   private readonly toastCtrl = inject(ToastController);
   private readonly tokenStorage = inject(TokenStorageService);
+  private readonly cdr = inject(ChangeDetectorRef);
   // ── ViewChild ────────────────────────────────────────────────────────
   @ViewChild('chatContent') private chatContent!: IonContent;
   @ViewChild('commentArea') private commentAreaRef!: ElementRef<HTMLElement>;
@@ -252,7 +253,28 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
   }
 
   async onCloseTicket(): Promise<void> {
-    await this.showToast('Feature under development.', 'warning');
+    this.ticketService.softDeleteTicket(this.ticketPublicId).subscribe({
+      next: async (updatedTicket) => {
+        this.ticket = updatedTicket;
+
+        this.canManageTicket =
+          !updatedTicket.assignedTo ||
+          updatedTicket.assignedTo.publicId === this.currentUserPublicId;
+
+        this.form.patchValue({
+          status: updatedTicket.status,
+          priority: updatedTicket.priority,
+        });
+
+        this.updateFormState();
+        this.cdr.detectChanges();
+
+        await this.showToast('Ticket encerrado com sucesso.', 'success');
+      },
+      error: async () => {
+        await this.showToast('Falha ao encerrar o ticket.', 'danger');
+      },
+    });
   }
 
   onCommentInput(event: Event): void {
@@ -304,7 +326,7 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
         this.form.patchValue({
           status: data.status,
           priority: data.priority,
-          assignTo: data.assignedTo ?? null,
+          assignTo: data.assignedTo?.publicId ?? null,
         });
 
         this.updateFormState();
@@ -390,13 +412,26 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
   }
 
   private loadMessages(ticketId: string): void {
+    console.log('[TicketFindPage] loadMessages ticketId:', ticketId);
+
     this.ticketService.getMessages(ticketId).subscribe({
       next: (messages) => {
+        console.log('[TicketFindPage] getMessages next:', messages);
+        messages.forEach((msg) =>
+          console.log(
+            '[TicketFindPage] message senderType:',
+            msg.senderType,
+            'isUserMessage:',
+            this.isUserMessage(msg),
+          ),
+        );
+
         this.messages = messages;
         this.shouldScrollToBottom = true;
       },
 
-      error: () => {
+      error: (error) => {
+        console.error('[TicketFindPage] getMessages error:', error);
         this.showToast('Failed to load messages.', 'danger');
       },
     });
