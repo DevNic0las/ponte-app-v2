@@ -1,61 +1,77 @@
-<!-- ticket-list.page.html -->
-
-<ion-header>
-  <ion-toolbar>
+<ion-header class="ion-no-border">
+  <ion-toolbar color="light">
     <ion-buttons slot="start">
-      <ion-button routerLink="/dashboard">
-        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      <ion-button class="btn-back">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
-
-    <ion-title>Atendimento</ion-title>
-
-    <ion-buttons slot="end">
-      <ion-button>
-        <ion-icon slot="icon-only" name="search"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+    <ion-title class="ion-text-center">ATENDIMENTO</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="ticket-list-page">
-    <!-- Cabeçalho editorial -->
-    <div class="ticket-list-page__editorial">
-      <span class="ticket-list-page__eyebrow">VISÃO GERAL</span>
-      <h2 class="ticket-list-page__heading">Gerenciamento de Chamados</h2>
-      <p class="ticket-list-page__subheading">
-        Acompanhe e responda às solicitações ativas da plataforma.
-      </p>
-    </div>
+<ion-content class="ion-padding" (click)="onContentClick($event)">
 
-    <!-- Estado: loading -->
-    @if (isLoading()) {
-    <div class="ticket-list-page__center">
-      <ion-spinner name="crescent" color="primary"></ion-spinner>
-    </div>
-    }
+  <div class="editorial-header">
+    <span class="subtitle">VISÃO GERAL</span>
+    <h2 class="title">Gerenciamento de Chamados</h2>
+    <p class="description">Acompanhe e responda às solicitações ativas da plataforma.</p>
 
-    <!-- Estado: erro -->
-    @if (error()) {
-    <div class="ticket-list-page__center ticket-list-page__center--error">
-      <ion-icon name="alert-circle-outline"></ion-icon>
-      <p>{{ error() }}</p>
-      <ion-button fill="outline" color="primary" (click)="loadTickets()">
-        Tentar novamente
+    <!-- FILTRO -->
+    <div class="filter-container" #filterWrapper>
+      <ion-button fill="outline" class="btn-filter" (click)="toggleDropdown($event)">
+        <ion-icon slot="start" name="options-outline"></ion-icon>
+        {{ activeFilter() === 'all' ? 'Filtrar' : getActiveLabel() }}
+        <ion-icon slot="end" name="chevron-down-outline"></ion-icon>
       </ion-button>
-    </div>
-    }
 
-    <!-- Lista de cards -->
-    @if (!isLoading() && !error()) {
-    <div class="ticket-list-page__list">
-      @for (ticket of tickets(); track trackByTicketId($index, ticket)) {
-      <app-ticket-list-card [ticket]="ticket" (ticketClick)="onTicketSelected($event)" />
-      }
+      <div class="filter-dropdown" *ngIf="isFilterOpen">
+        <div class="popover-header">Filtrar por Status</div>
+        <div
+          class="filter-option"
+          *ngFor="let option of filterOptions"
+          (click)="setFilter(option.value)"
+          [class.active]="activeFilter() === option.value"
+        >
+          <span class="dot" [style.background]="option.color"></span>
+          <span class="filter-label">{{ option.label }}</span>
+          <ion-icon name="checkmark-outline" *ngIf="activeFilter() === option.value"></ion-icon>
+        </div>
+      </div>
     </div>
-    }
+
   </div>
+
+  <!-- Loading -->
+  <div class="state-container" *ngIf="isLoading()">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Carregando chamados...</p>
+  </div>
+
+  <!-- Erro -->
+  <div class="state-container state-error" *ngIf="error() && !isLoading()">
+    <ion-icon name="alert-circle-outline"></ion-icon>
+    <p>{{ error() }}</p>
+    <ion-button fill="outline" size="small" (click)="loadTickets()">
+      Tentar novamente
+    </ion-button>
+  </div>
+
+  <!-- Lista -->
+  <div class="ticket-list" *ngIf="!isLoading() && !error()">
+
+    <div class="state-container" *ngIf="filteredTickets().length === 0">
+      <ion-icon name="folder-open-outline"></ion-icon>
+      <p>Nenhum chamado encontrado.</p>
+    </div>
+
+    <app-ticket-list-card
+      *ngFor="let ticket of filteredTickets(); trackBy: trackByTicketId"
+      [ticket]="ticket"
+      (ticketClick)="onTicketSelected(ticket)"
+    ></app-ticket-list-card>
+
+  </div>
+
 </ion-content>
 
- <app-bottom-nav></app-bottom-nav> 
+<app-bottom-nav></app-bottom-nav>

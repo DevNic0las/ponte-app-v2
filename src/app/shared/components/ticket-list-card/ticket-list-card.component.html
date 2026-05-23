@@ -34,8 +34,10 @@
     <!-- Rodapé -->
     <div class="list-card__footer">
       <div class="list-card__requester">
-        <!-- <div class="list-card__avatar">{{ ticket.requesterInitials }}</div> -->
-        <span class="list-card__requester-name">{{ ticket.assignedTo }}</span>
+        <div class="list-card__avatar">{{ ticket.requestedBy.name | slice:0:2 | uppercase }}</div> 
+        <span class="list-card__requester-name" *ngIf="ticket.assignedTo">
+          {{ ticket.assignedTo.name }}
+        </span>
       </div>
       <span class="list-card__date">
         {{ ticket.createdAt | date: "dd/MM/yyyy '•' HH:mm" }}

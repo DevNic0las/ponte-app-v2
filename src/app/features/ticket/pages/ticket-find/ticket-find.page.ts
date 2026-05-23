@@ -114,7 +114,7 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
   isSubmitting = false;
   commentFocused = false;
   commentLength = 0;
-
+  requesterInitials: string = '';
   private shouldScrollToBottom = false;
   private ticketPublicId = '';
 
@@ -319,7 +319,6 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
     this.ticketService.findTicketById(publicId).subscribe({
       next: (data) => {
         this.ticket = data;
-
         this.canManageTicket =
           !data.assignedTo || data.assignedTo.publicId === this.currentUserPublicId;
 
