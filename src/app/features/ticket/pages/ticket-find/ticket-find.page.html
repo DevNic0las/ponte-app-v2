@@ -19,18 +19,7 @@
           {{ ticket.requestedBy?.name ?? '—' }}
         </span>
       </div>
-      <div class="meta-row meta-row--badges">
-        <span class="info-badge info-badge--status">
-          {{ ticket.status | ticketStatus }}
-        </span>
-        <span class="info-badge info-badge--priority" [attr.data-priority]="ticket.priority">
-          {{ ticket.priority }}
-        </span>
-        <span class="meta-item" *ngIf="ticket.assignedTo">
-          <ion-icon name="person-circle-outline"></ion-icon>
-          {{ ticket.assignedTo.name }}
-        </span>
-      </div>
+    
     </div>
   </ion-toolbar>
 </ion-header>

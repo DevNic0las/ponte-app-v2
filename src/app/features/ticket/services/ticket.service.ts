@@ -14,7 +14,7 @@ import {
 import { TicketMessage } from '../models/ticket-message.model';
 import { UserProfile } from '../../profile/models/profile.model';
 export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-type SenderType = 'REQUESTER' | 'TECHNICIAN';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -98,6 +98,9 @@ export class TicketService {
     return this.http.get<UserProfile[]>(`${this.apiUrl}/users/technicians`);
   }
   softDeleteTicket(id: string): Observable<TicketResponse> {
-    return this.http.delete<TicketResponse>(`${this.apiUrl}/tickets/${id}`);
+    return this.http.patch<TicketResponse>(`${this.apiUrl}/tickets/${id}/close`, null);
+  }
+  listTicketsByStatus(status: TicketStatus): Observable<TicketResponse[]> {
+    return this.http.get<TicketResponse[]>(`${this.apiUrl}/tickets/status?status_ticket=${status}`);
   }
 }
