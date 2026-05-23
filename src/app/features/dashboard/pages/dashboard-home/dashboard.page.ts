@@ -47,35 +47,45 @@ export class DashboardHomePage {
         icon: 'alert-circle-outline',
         title: 'Novos Chamados',
         subtitle: `${counts.open} abertos`,
-        route: '/tickets/new',
+        route: '/tickets/list',
+        queryParams: {
+          status: 'OPEN',
+        },
       },
       {
         icon: 'time-outline',
         title: 'Chamados em Andamento',
         subtitle: `${counts.inProgress} andamento`,
-        route: '/tickets/in-progress',
-      },
-      {
-        icon: 'calendar-outline',
-        title: 'Chamados Planejados',
-        subtitle: `${counts.pending} pendentes`,
-        route: '/tickets/planned',
+        route: '/tickets/list',
+        queryParams: {
+          status: 'IN_PROGRESS',
+        },
       },
       {
         icon: 'checkmark-circle-outline',
-        title: 'Chamados Finalizados',
-        subtitle: `${counts.closed} concluídos`,
-        route: '/tickets/closed',
+        title: 'Chamados Concluídos',
+        subtitle: `${counts.resolved} concluídos`,
+        route: '/tickets/list',
+        queryParams: {
+          status: 'RESOLVED',
+        },
+      },
+      {
+        icon: 'person-outline',
+        title: 'Cadastro de usuários',
+        subtitle: 'Registrar novos acessos',
+        route: '/users',
       },
     ]),
   );
 
   onActionCardClick(card: ActionCard): void {
-    
     this.router.navigate([card.route]);
   }
 
   onTicketCardClick(ticket: TicketCard): void {
-    this.router.navigate([ticket.route]);
+    this.router.navigate([ticket.route], {
+      queryParams: ticket.queryParams,
+    });
   }
 }
