@@ -1,21 +1,11 @@
 // src/app/features/ticket/ticket-find/ticket-find.page.ts
 
-import {
-  Component,
-  OnInit,
-  AfterViewChecked, // ← adicionado
-  ViewChild, // ← adicionado
-  inject,
-} from '@angular/core';
+import { Component, OnInit, AfterViewChecked, ViewChild, inject, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormsModule,
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+import { jwtDecode } from 'jwt-decode';
 import {
   IonContent,
   IonHeader,
@@ -29,29 +19,30 @@ import {
   IonBackButton,
   IonButtons,
   IonBadge,
-  IonButton, // ← adicionado
-  IonIcon, // ← adicionado
-  IonFooter, // ← adicionado (usado no template)
-  IonGrid, // ← adicionado (usado no template)
-  IonRow, // ← adicionado (usado no template)
-  IonCol, // ← adicionado (usado no template)
+  IonButton,
+  IonIcon,
+  IonFooter,
+  IonGrid,
+  IonRow,
+  IonCol,
   LoadingController,
   ToastController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   calendarOutline,
-  personOutline, // ← adicionado
+  personOutline,
   checkmarkCircleOutline,
-  closeCircleOutline, // ← adicionado
+  closeCircleOutline,
+  lockClosedOutline, // ← adicionado para o ícone do comment-hint
 } from 'ionicons/icons';
-
+import { ChangeDetectorRef } from '@angular/core';
 import { TicketService } from '../../services/ticket.service';
-import { TicketPriority, TicketResponse, TicketUpdatePayload } from '../../models/ticket.model';
+import { TicketPriority, TicketResponse } from '../../models/ticket.model';
 import { TicketMessage } from '../../models/ticket-message.model';
 import { TicketStatusPipe, TicketStatusColorPipe } from '../../pipe/ticket-status.pipe';
-
-// ── Tipos locais ─────────────────────────────────────────────────────
+import { TokenStorageService } from '../../../../core/storage/token-storage.service';
+import { UserProfile } from 'src/app/features/profile/models/profile.model';
 interface SelectOption {
   label: string;
   value: string;
@@ -61,6 +52,14 @@ interface PriorityOption {
   label: string;
   value: TicketPriority;
 }
+
+interface JwtPayload {
+  sub: string;
+  name: string;
+  role: string;
+  exp: number;
+}
+export type SenderType = 'REQUESTER' | 'TECHNICIAN';
 
 @Component({
   selector: 'app-ticket-find',
@@ -85,12 +84,12 @@ interface PriorityOption {
     IonBadge,
     TicketStatusPipe,
     TicketStatusColorPipe,
-    IonButton, // ← adicionado
-    IonIcon, // ← adicionado
-    IonFooter, // ← adicionado
-    IonGrid, // ← adicionado
-    IonRow, // ← adicionado
-    IonCol, // ← adicionado
+    IonButton,
+    IonIcon,
+    IonFooter,
+    IonGrid,
+    IonRow,
+    IonCol,
   ],
 })
 export class TicketFindPage implements OnInit, AfterViewChecked {
@@ -100,41 +99,41 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
   private readonly ticketService = inject(TicketService);
   private readonly loadingCtrl = inject(LoadingController);
   private readonly toastCtrl = inject(ToastController);
-
+  private readonly tokenStorage = inject(TokenStorageService);
+  private readonly cdr = inject(ChangeDetectorRef);
   // ── ViewChild ────────────────────────────────────────────────────────
   @ViewChild('chatContent') private chatContent!: IonContent;
-
+  @ViewChild('commentArea') private commentAreaRef!: ElementRef<HTMLElement>;
   // ── State ────────────────────────────────────────────────────────────
   ticket: TicketResponse | null = null;
   messages: TicketMessage[] = [];
+  assignTo: UserProfile[] = [];
+  currentUserName = '';
+  currentUserPublicId = '';
+  canManageTicket = false;
   isSubmitting = false;
+  commentFocused = false;
+  commentLength = 0;
+
   private shouldScrollToBottom = false;
-  private ticketPublicId = ''; // guardado para usar na chave do storage
+  private ticketPublicId = '';
 
   // ── Select options ───────────────────────────────────────────────────
+  public isUserMessage(message: TicketMessage): boolean {
+    return message.senderType === 'REQUESTER';
+  }
 
   readonly priorities: PriorityOption[] = [
-    { label: 'Low', value: 'LOW' },
-    { label: 'Medium', value: 'MEDIUM' },
-    { label: 'High', value: 'HIGH' },
-    { label: 'Critical', value: 'CRITICAL' },
-  ];
-
-  readonly assignOptions: SelectOption[] = [
-    { label: 'Level 2 Support', value: 'SUPPORT_L2' },
-    { label: 'Backend Development', value: 'DEV_BACKEND' },
-    { label: 'Infrastructure', value: 'INFRA' },
-    { label: 'Financial', value: 'FINANCIAL' },
-    { label: 'Hardware Analysis', value: 'HARDWARE_ANALYSIS' },
-    { label: 'Network Analysis', value: 'NETWORK_ANALYSIS' },
-    { label: 'On-site Visit', value: 'ONSITE_VISIT' },
+    { label: 'Baixo', value: 'LOW' },
+    { label: 'Médio', value: 'MEDIUM' },
+    { label: 'Alto', value: 'HIGH' },
+    { label: 'Crítico', value: 'CRITICAL' },
   ];
 
   readonly statusOptions: SelectOption[] = [
-    { label: 'Open', value: 'OPEN' },
-    { label: 'In Progress', value: 'IN_PROGRESS' },
-    { label: 'In Analysis', value: 'IN_ANALYSIS' },
-    { label: 'Closed', value: 'CLOSED' },
+    { label: 'Aberto', value: 'OPEN' },
+    { label: 'Em Andamento', value: 'IN_PROGRESS' },
+    { label: 'Fechado', value: 'CLOSED' },
   ];
 
   // ── Form ─────────────────────────────────────────────────────────────
@@ -146,6 +145,7 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
       personOutline,
       checkmarkCircleOutline,
       closeCircleOutline,
+      lockClosedOutline,
     });
   }
 
@@ -154,6 +154,7 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
   ngOnInit(): void {
     this.buildForm();
     this.loadTicketData();
+    this.loadTechnicians();
   }
 
   ngAfterViewChecked(): void {
@@ -161,12 +162,6 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
       this.scrollToBottom();
       this.shouldScrollToBottom = false;
     }
-  }
-
-  // ── Public helpers ───────────────────────────────────────────────────
-
-  isUserMessage(msg: TicketMessage): boolean {
-    return msg.sender === 'USER';
   }
 
   // ── Actions ──────────────────────────────────────────────────────────
@@ -177,62 +172,147 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
       return;
     }
 
+    if (!this.ticket) return;
+
     const loading = await this.loadingCtrl.create({
       message: 'Sending update...',
     });
+
     await loading.present();
+
     this.isSubmitting = true;
 
     try {
-      const payload = this.buildPayload();
-      await this.ticketService.updateTicket(this.ticket!.publicId, payload);
+      const { priority, status, assignTo, comment } = this.form.value;
+      console.log('assignTo do form:', assignTo);
+      console.log('ticket.assignedTo:', this.ticket.assignedTo);
+      // ─────────────────────────────────────────────
+      // PRIORITY
+      // ─────────────────────────────────────────────
 
-      const statusLabel =
-        this.statusOptions.find((s) => s.value === payload.status)?.label ?? payload.status;
+      if (priority && priority !== this.ticket.priority) {
+        await firstValueFrom(this.ticketService.assignPriority(this.ticket.publicId, priority));
 
-      const newMessage: TicketMessage = {
-        id: Date.now(),
-        content: `Status updated to: ${statusLabel}`,
-        sender: 'ADMIN',
-        timestamp: this.getCurrentTime(),
-      };
+        this.ticket.priority = priority;
+      }
 
-      this.messages.push(newMessage);
-      this.saveMessages(); // ← persiste no localStorage
+      // ─────────────────────────────────────────────
+      // STATUS
+      // ─────────────────────────────────────────────
 
-      this.shouldScrollToBottom = true;
-      this.form.reset();
-      await this.showToast('Update sent successfully!', 'success');
-    } catch {
-      await this.showToast('Failed to send update. Please try again.', 'danger');
+      if (status && status !== this.ticket.status) {
+        await firstValueFrom(this.ticketService.assignStatus(this.ticket.publicId, status));
+
+        this.ticket.status = status;
+      }
+
+      // ─────────────────────────────────────────────
+      // ASSIGN
+      // ─────────────────────────────────────────────
+
+      if (assignTo && assignTo !== this.ticket.assignedTo?.publicId) {
+        await firstValueFrom(this.ticketService.assignTicket(this.ticket.publicId, assignTo));
+
+        this.ticket.assignedTo = this.assignTo.find((t) => t.publicId === assignTo) ?? undefined;
+
+        this.canManageTicket =
+          !this.ticket.assignedTo || this.ticket.assignedTo.publicId === this.currentUserPublicId;
+
+        this.updateFormState();
+      }
+      // ─────────────────────────────────────────────
+      // MESSAGE
+      // ─────────────────────────────────────────────
+
+      if (comment?.trim()) {
+        const msg = await firstValueFrom(
+          this.ticketService.sendMessage(this.ticket.publicId, comment),
+        );
+
+        this.messages = [...this.messages, msg];
+
+        this.form.get('comment')?.setValue('');
+
+        this.commentLength = 0;
+
+        this.clearCommentArea();
+
+        this.shouldScrollToBottom = true;
+      }
+
+      await this.showToast('Ticket updated successfully.', 'success');
+    } catch (error) {
+      console.error(error);
+
+      await this.showToast('Failed to update ticket.', 'danger');
     } finally {
       this.isSubmitting = false;
+
       await loading.dismiss();
     }
   }
 
   async onCloseTicket(): Promise<void> {
-    // TODO: AlertController confirmation + ticketService.closeTicket()
-    await this.showToast('Feature under development.', 'warning');
+    this.ticketService.softDeleteTicket(this.ticketPublicId).subscribe({
+      next: async (updatedTicket) => {
+        this.ticket = updatedTicket;
+
+        this.canManageTicket =
+          !updatedTicket.assignedTo ||
+          updatedTicket.assignedTo.publicId === this.currentUserPublicId;
+
+        this.form.patchValue({
+          status: updatedTicket.status,
+          priority: updatedTicket.priority,
+        });
+
+        this.updateFormState();
+        this.cdr.detectChanges();
+
+        await this.showToast('Ticket encerrado com sucesso.', 'success');
+      },
+      error: async () => {
+        await this.showToast('Falha ao encerrar o ticket.', 'danger');
+      },
+    });
+  }
+
+  onCommentInput(event: Event): void {
+    // ← movido para dentro da classe
+    const el = event.target as HTMLElement;
+    const text = el.innerText ?? '';
+    this.commentLength = text.length;
+    this.form.get('comment')?.setValue(text);
   }
 
   // ── Private ──────────────────────────────────────────────────────────
 
   private buildForm(): void {
     this.form = this.fb.group({
-      status: [null, Validators.required],
-      priority: [null, Validators.required],
-      assignTo: [null], // optional per TicketUpdatePayload
+      status: [null],
+      priority: [null],
+      assignTo: [null],
+      comment: [''],
     });
   }
-
-  private loadTicketData(): void {
+  private async loadTicketData(): Promise<void> {
     const publicId = this.route.snapshot.paramMap.get('publicId');
 
     if (!publicId) {
-      this.showToast('Invalid ticket ID.', 'danger');
+      await this.showToast('Invalid ticket ID.', 'danger');
       return;
     }
+
+    const currentUser = await this.tokenStorage.getToken();
+
+    if (!currentUser) {
+      await this.showToast('User not authenticated.', 'danger');
+      return;
+    }
+
+    const decoded = jwtDecode<JwtPayload>(currentUser);
+    this.currentUserName = decoded.name;
+    this.currentUserPublicId = decoded.sub;
 
     this.ticketPublicId = publicId;
 
@@ -240,83 +320,27 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
       next: (data) => {
         this.ticket = data;
 
-        // Pré-popula o form com os valores atuais do ticket
+        this.canManageTicket =
+          !data.assignedTo || data.assignedTo.publicId === this.currentUserPublicId;
+
         this.form.patchValue({
           status: data.status,
           priority: data.priority,
-          assignTo: data.assignedTo ?? null,
+          assignTo: data.assignedTo?.publicId ?? null,
         });
+
+        this.updateFormState();
+
+        this.loadMessages(data.publicId);
       },
       error: () => {
         this.showToast('Failed to load ticket data.', 'danger');
       },
     });
-
-    this.messages = this.loadMessages();
-    this.shouldScrollToBottom = true;
   }
 
-  private buildPayload(): TicketUpdatePayload {
-    const { status, priority, assignTo } = this.form.value;
-    return {
-      status,
-      priority: priority as TicketPriority,
-      ...(assignTo ? { assignTo } : {}),
-    };
-  }
-
-  // ── localStorage ─────────────────────────────────────────────────────
-
-  private storageKey(): string {
-    return `ticket_messages_${this.ticketPublicId}`;
-  }
-
-  private loadMessages(): TicketMessage[] {
-    try {
-      const stored = localStorage.getItem(this.storageKey());
-      if (stored) {
-        return JSON.parse(stored) as TicketMessage[];
-      }
-    } catch {
-      // JSON corrompido — ignora e usa as mensagens iniciais
-    }
-    return this.initialMessages();
-  }
-
-  private saveMessages(): void {
-    try {
-      localStorage.setItem(this.storageKey(), JSON.stringify(this.messages));
-    } catch {
-      // localStorage cheio ou indisponível — falha silenciosa
-    }
-  }
-
-  private initialMessages(): TicketMessage[] {
-    return [
-      {
-        id: 1,
-        content:
-          'SUPPORT TICKET - IT\n\nTitle: COMPUTER NOT TURNING ON\nType: New Ticket - IT\n\nREQUESTER INFO\nName: Ricardo Silva\nPhone: 08198189420\n\nPROBLEM DETAILS\nCategory: Computer & Peripherals\nSubcategory: Computer/Notebook failure\nFailure type: Does not turn on',
-        sender: 'USER',
-        timestamp: '09:15 AM',
-      },
-      {
-        id: 2,
-        content:
-          'Good morning, Ricardo. We are already reviewing your request with the engineering team. We will get back to you shortly.',
-        sender: 'ADMIN',
-        timestamp: '09:22 AM',
-      },
-    ];
-  }
-
-  // ── Utilities ────────────────────────────────────────────────────────
-
-  private getCurrentTime(): string {
-    return new Date().toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  private async loadTechnicians(): Promise<void> {
+    this.assignTo = await firstValueFrom(this.ticketService.getTechnicians());
   }
 
   private scrollToBottom(): void {
@@ -331,5 +355,85 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
       position: 'top',
     });
     await toast.present();
+  }
+
+  async sendMessageTicket(): Promise<void> {
+    const comment = this.form.get('comment')?.value?.trim();
+
+    if (!comment) {
+      await this.showToast('Escreva uma mensagem antes de enviar.', 'warning');
+      return;
+    }
+
+    if (!this.ticket) return;
+
+    const token = await this.tokenStorage.getToken();
+    if (!token) {
+      await this.showToast('User not authenticated.', 'danger');
+      return;
+    }
+
+    const loading = await this.loadingCtrl.create({ message: 'Enviando mensagem...' });
+    await loading.present();
+
+    this.ticketService.sendMessage(this.ticket.publicId, comment).subscribe({
+      next: (msg) => {
+        this.messages = [...this.messages, msg];
+        this.form.get('comment')?.setValue('');
+        this.commentLength = 0;
+        this.clearCommentArea();
+        this.shouldScrollToBottom = true;
+        loading.dismiss();
+        this.showToast('Mensagem enviada.', 'success');
+      },
+      error: () => {
+        loading.dismiss();
+        this.showToast('Falha ao enviar mensagem.', 'danger');
+      },
+    });
+  }
+
+  private clearCommentArea(): void {
+    if (this.commentAreaRef?.nativeElement) {
+      this.commentAreaRef.nativeElement.innerText = '';
+    }
+  }
+
+  private updateFormState(): void {
+    if (this.canManageTicket) {
+      this.form.get('status')?.enable();
+      this.form.get('priority')?.enable();
+      this.form.get('assignTo')?.enable();
+    } else {
+      this.form.get('status')?.disable();
+      this.form.get('priority')?.disable();
+      this.form.get('assignTo')?.disable();
+    }
+  }
+
+  private loadMessages(ticketId: string): void {
+    console.log('[TicketFindPage] loadMessages ticketId:', ticketId);
+
+    this.ticketService.getMessages(ticketId).subscribe({
+      next: (messages) => {
+        console.log('[TicketFindPage] getMessages next:', messages);
+        messages.forEach((msg) =>
+          console.log(
+            '[TicketFindPage] message senderType:',
+            msg.senderType,
+            'isUserMessage:',
+            this.isUserMessage(msg),
+          ),
+        );
+
+        this.messages = messages;
+        this.shouldScrollToBottom = true;
+      },
+
+      error: (error) => {
+        console.error('[TicketFindPage] getMessages error:', error);
+        this.showToast('Failed to load messages.', 'danger');
+      },
+    });
   }
 }

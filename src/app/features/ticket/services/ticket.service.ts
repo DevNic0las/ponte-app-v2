@@ -2,8 +2,19 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { Category, Sector, Subcategory, TicketRequest, TicketResponse,TicketUpdatePayload } from '../models/ticket.model';
+import {
+  Category,
+  Sector,
+  Subcategory,
+  TicketRequest,
+  TicketResponse,
+  TicketStatus,
+  TicketUpdatePayload,
+} from '../models/ticket.model';
+import { TicketMessage } from '../models/ticket-message.model';
+import { UserProfile } from '../../profile/models/profile.model';
 export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+type SenderType = 'REQUESTER' | 'TECHNICIAN';
 @Injectable({
   providedIn: 'root',
 })
@@ -31,8 +42,28 @@ export class TicketService {
     return this.http.delete<TicketResponse>(`${this.apiUrl}/tickets/${id}`);
   }
 
-  assignTicket(id: string): Observable<TicketResponse> {
-    return this.http.patch<TicketResponse>(`${this.apiUrl}/tickets/${id}/assign`, null);
+  assignTicket(id: string, newUser: string): Observable<TicketResponse> {
+    return this.http.patch<TicketResponse>(
+      `${this.apiUrl}/tickets/${id}/assign?newUser=${newUser}`,
+      null,
+    );
+  }
+
+  assignPriority(id: string, priority: TicketPriority): Observable<TicketResponse> {
+    return this.http.patch<TicketResponse>(
+      `${this.apiUrl}/tickets/${id}/assign/priority?priority=${priority}`,
+      {
+        priority,
+      },
+    );
+  }
+  assignStatus(ticketId: string, status: TicketStatus): Observable<TicketResponse> {
+    return this.http.patch<TicketResponse>(
+      `${this.apiUrl}/tickets/${ticketId}/assign/status?status=${status}`,
+      {
+        status,
+      },
+    );
   }
 
   closeTicket(id: string): Observable<TicketResponse> {
@@ -54,5 +85,19 @@ export class TicketService {
   }
   getSectors(): Observable<Sector[]> {
     return this.http.get<Sector[]>(`${this.apiUrl}/sectors`);
+  }
+  getMessages(ticketId: string): Observable<TicketMessage[]> {
+    return this.http.get<TicketMessage[]>(`${this.apiUrl}/messages/${ticketId}`);
+  }
+  sendMessage(ticketId: string, content: string): Observable<TicketMessage> {
+    return this.http.post<TicketMessage>(`${this.apiUrl}/messages/${ticketId}`, {
+      content,
+    });
+  }
+  getTechnicians(): Observable<UserProfile[]> {
+    return this.http.get<UserProfile[]>(`${this.apiUrl}/users/technicians`);
+  }
+  softDeleteTicket(id: string): Observable<TicketResponse> {
+    return this.http.delete<TicketResponse>(`${this.apiUrl}/tickets/${id}`);
   }
 }

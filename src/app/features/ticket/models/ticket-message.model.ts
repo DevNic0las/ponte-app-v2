@@ -1,8 +1,11 @@
-export type MessageSender = 'USER' | 'ADMIN';
+export type MessageSender = 'REQUESTER' | 'TECHNICIAN';
 
 export interface TicketMessage {
-  id: number;
+  publicId: string;
+  senderType: MessageSender;
   content: string;
-  sender: MessageSender;
-  timestamp: string; // ex: "09:22 AM"
+  createdAt: string;
+  isRead: boolean;
+  senderId: number;
+  ticketId: number;
 }
