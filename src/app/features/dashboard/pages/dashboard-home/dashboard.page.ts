@@ -74,12 +74,14 @@ export class DashboardHomePage {
         icon: 'person-outline',
         title: 'Cadastro de usuários',
         subtitle: 'Registrar novos acessos',
-        route: '/users',
+        route: '/dashboard/new-user',
       },
     ]),
   );
 
   onActionCardClick(card: ActionCard): void {
+    console.log(card.route);
+    
     this.router.navigate([card.route]);
   }
 
