@@ -32,4 +32,8 @@ export const routes: Routes = [
     loadChildren: () => import('./features/ticket/ticket.routes').then((m) => m.TICKET_ROUTES),
     canActivate: [authGuard],
   },
+  {
+    path: 'new-user',
+    loadComponent: () => import('./features/dashboard/pages/new-user/new-user.page').then((m) => m.NovoUsuarioPage),
+  },
 ];

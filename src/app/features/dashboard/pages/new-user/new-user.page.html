@@ -1,0 +1,104 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Novo Usuário</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-wrapper">
+
+    <div class="editorial-header">
+      <span class="section-tag">Administração de Acesso</span>
+      <h1 class="page-title">Configurar credenciais</h1>
+      <p class="page-subtitle">
+        Preencha os dados abaixo para habilitar o acesso do novo colaborador.
+      </p>
+    </div>
+
+    <div class="form-card">
+
+      <div class="field-group">
+        <label class="field-label">Nome Completo</label>
+        <div class="input-wrapper">
+          <input
+            class="field-input"
+            type="text"
+            [(ngModel)]="nomeCompleto"
+            placeholder="Ex: Roberto Alencar Silva"
+            autocomplete="name"
+          />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">E-mail Corporativo</label>
+        <div class="input-wrapper">
+          <input
+            class="field-input"
+            type="email"
+            [(ngModel)]="emailCorporativo"
+            placeholder="roberto.silva@empresa.com.br"
+            autocomplete="email"
+            inputmode="email"
+          />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Departamento</label>
+        <div class="input-wrapper select-wrapper">
+          <select class="field-input field-select" [(ngModel)]="departamento">
+            <option value="" disabled selected>Selecione a área</option>
+            <option *ngFor="let dep of departamentos" [value]="dep.value">
+              {{ dep.label }}
+            </option>
+          </select>
+          <span class="select-arrow">&#8250;</span>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Senha Provisória</label>
+        <div class="input-wrapper password-wrapper">
+          <input
+            class="field-input"
+            [type]="mostrarSenha() ? 'text' : 'password'"
+            [(ngModel)]="senhaProvisoria"
+            placeholder="••••••••"
+            autocomplete="new-password"
+          />
+          <button class="eye-btn" (click)="toggleSenha()" type="button">
+            <ion-icon [name]="mostrarSenha() ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
+          </button>
+        </div>
+        <p class="field-hint">O usuário deverá alterar esta senha no primeiro login.</p>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" (click)="cadastrar()">
+          Cadastrar Usuário
+        </button>
+        <button class="btn-secondary" (click)="cancelar()">
+          Cancelar
+        </button>
+      </div>
+    </div>
+
+    <div class="banner-card">
+      <img
+        class="banner-img"
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXLbkZdT7plABrU5k1ZBUDPDjQQKQtn9bb5S526GQLR9L2UlqZxGAAG8adXz5t1mkWgywUshN3kPN9nRkhdUBgR_QIc9fLbcU2ELvWGjvO_hk9e2RewT_eayOlUwf-aZ-EIkcDBR-VNH0QvSEEGJGo8dZmrPGkJhlq-Y3e8EyQrAkbqSYgIP16nx56wDMbxbv4JEz2_W9aTKJpHgQhasTGeIA_kGx-61dsQHfPP6dMcKRL-T7PcDfU-jp3a4CVLL8hYgiQucZ-fS28"
+        alt="Abstract Digital Connectivity"
+      />
+      <div class="banner-overlay"></div>
+      <div class="banner-content">
+        <p class="banner-tag">Segurança Ponte</p>
+        <p class="banner-text">Criptografia de ponta-a-ponta em todos os novos acessos.</p>
+      </div>
+    </div>
+
+  </div>
+</ion-content>
