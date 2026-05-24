@@ -3,7 +3,12 @@
   --ion-background-color: var(--color-background);
   --ion-text-color: var(--color-on-surface);
 }
-
+ion-title {
+  color: #6b00cc;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  
+}
 // ── Header ────────────────────────────────────────────────────────
 .ticket-header {
 

@@ -1,18 +1,15 @@
 <ion-header class="ion-no-border">
   <ion-toolbar color="light">
     <ion-buttons slot="start">
-      <ion-button class="btn-back">
-        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
-      </ion-button>
+      <ion-back-button text="" defaultHref="/home"></ion-back-button>
     </ion-buttons>
-   <ion-title class="ion-text-center">
-  {{ mode === 'my' ? 'MEUS CHAMADOS' : 'ATENDIMENTO' }}
-</ion-title>
+    <ion-title  >
+      {{ mode === 'my' ? 'MEUS CHAMADOS' : 'ATENDIMENTO' }}
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding" (click)="onContentClick($event)">
-
   <div class="editorial-header">
     <span class="subtitle">VISÃO GERAL</span>
     <h2 class="title">Gerenciamento de Chamados</h2>
@@ -40,7 +37,6 @@
         </div>
       </div>
     </div>
-
   </div>
 
   <!-- Loading -->
@@ -53,14 +49,11 @@
   <div class="state-container state-error" *ngIf="error() && !isLoading()">
     <ion-icon name="alert-circle-outline"></ion-icon>
     <p>{{ error() }}</p>
-    <ion-button fill="outline" size="small" (click)="loadTickets()">
-      Tentar novamente
-    </ion-button>
+    <ion-button fill="outline" size="small" (click)="loadTickets()"> Tentar novamente </ion-button>
   </div>
 
   <!-- Lista -->
   <div class="ticket-list" *ngIf="!isLoading() && !error()">
-
     <div class="state-container" *ngIf="filteredTickets().length === 0">
       <ion-icon name="folder-open-outline"></ion-icon>
       <p>Nenhum chamado encontrado.</p>
@@ -71,9 +64,7 @@
       [ticket]="ticket"
       (ticketClick)="onTicketSelected(ticket)"
     ></app-ticket-list-card>
-
   </div>
-
 </ion-content>
 
 <app-bottom-nav></app-bottom-nav>

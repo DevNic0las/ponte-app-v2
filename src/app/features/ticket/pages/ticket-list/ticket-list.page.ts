@@ -33,7 +33,7 @@ import { TicketService } from '../../services/ticket.service';
 import { TicketResponse, TicketStatus } from '../../models/ticket.model';
 import { TicketListCardComponent } from '../../../../shared/components/ticket-list-card/ticket-list-card.component';
 import { BottomNavComponent } from 'src/app/shared/components/bottom-nav/bottom-nav.component';
-
+import { IonBackButton } from '@ionic/angular/standalone';
 export interface FilterOption {
   value: string;
   label: string;
@@ -60,6 +60,7 @@ export interface FilterOption {
     IonSpinner,
     TicketListCardComponent,
     BottomNavComponent,
+    IonBackButton,
   ],
   templateUrl: './ticket-list.page.html',
   styleUrls: ['./ticket-list.page.scss'],
@@ -137,13 +138,13 @@ export class TicketListPage implements OnInit {
     if (isMyMode) {
       request$ =
         status === 'all'
-          ? this.ticketService.findMyTickets()
-          : this.ticketService.findMyTicketsByStatus(status as TicketStatus);
+          ? this.ticketService.findMyTickets() // ← /tickets/my/tickets
+          : this.ticketService.findMyTicketsByStatus(status as TicketStatus); // ← /tickets/my/tickets/status
     } else {
       request$ =
         status === 'all'
-          ? this.ticketService.listTickets()
-          : this.ticketService.listTicketsByStatus(status as TicketStatus);
+          ? this.ticketService.listTickets() // ← /tickets
+          : this.ticketService.listTicketsByStatus(status as TicketStatus); // ← /tickets/status
     }
 
     request$.subscribe({

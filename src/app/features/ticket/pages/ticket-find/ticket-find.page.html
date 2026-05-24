@@ -1,9 +1,9 @@
 <ion-header class="ticket-header">
   <ion-toolbar class="main-toolbar">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tickets" text=""></ion-back-button>
+      <ion-back-button defaultHref="/tickets/list" text=""></ion-back-button>
     </ion-buttons>
-    <ion-title class="chat-title" *ngIf="ticket">Chamado #{{ ticket.publicId }}</ion-title>
+    <ion-title class="ion-text-left" *ngIf="ticket">ATENDIMENTO</ion-title>
   </ion-toolbar>
 
   <ion-toolbar class="subtitle-toolbar" *ngIf="ticket">
@@ -19,7 +19,6 @@
           {{ ticket.requestedBy?.name ?? '—' }}
         </span>
       </div>
-    
     </div>
   </ion-toolbar>
 </ion-header>
@@ -27,13 +26,8 @@
 <!-- Histórico -->
 <ion-content #chatContent class="chat-content">
   <div class="messages-wrapper">
-
     <!-- CARD DE INFORMAÇÕES -->
     <div class="ticket-info-card" *ngIf="ticket">
-      <div class="info-row">
-        <span class="info-label">Descrição</span>
-        <span class="info-value">{{ ticket.description }}</span>
-      </div>
       <div class="info-row">
         <span class="info-label">Solicitante</span>
         <span class="info-value">{{ ticket.requestedBy?.name ?? '—' }}</span>
@@ -47,8 +41,13 @@
         <span class="info-value">{{ ticket.createdAt | date: 'dd MMM, yyyy HH:mm' }}</span>
       </div>
       <div class="info-row" *ngIf="ticket.assignedTo">
-        <span class="info-label">Responsável</span>
+        <span class="info-label">Técnico</span>
         <span class="info-value">{{ ticket.assignedTo.name }}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label">Descrição</span>
+        <span class="info-value">{{ ticket.description }}</span>
       </div>
     </div>
 
@@ -56,28 +55,35 @@
       <span class="divider-label">Início do atendimento</span>
     </div>
 
+    <div class="empty-messages" *ngIf="messages.length === 0">
+      <ion-icon name="lock-closed-outline"></ion-icon>
+      <p>Chamado em análise</p>
+      <span>Aguarde, um técnico irá responder em breve.</span>
+    </div>
+
     <!-- MENSAGENS -->
-    <ng-container *ngFor="let msg of messages">
-      <div class="message-row user-row" *ngIf="isUserMessage(msg)">
-        <div class="bubble bubble-user">
-          <p class="bubble-text">{{ msg.content }}</p>
+    <ng-container *ngIf="messages.length > 0">
+      <ng-container *ngFor="let msg of messages">
+        <div class="message-row user-row" *ngIf="isUserMessage(msg)">
+          <div class="bubble bubble-user">
+            <p class="bubble-text">{{ msg.content }}</p>
+          </div>
+          <span class="bubble-time">{{ msg.createdAt }}</span>
         </div>
-        <span class="bubble-time">{{ msg.createdAt }}</span>
-      </div>
 
-      <div class="message-row admin-row" *ngIf="!isUserMessage(msg)">
-        <div class="bubble bubble-admin">
-          <p class="bubble-text">{{ msg.content }}</p>
+        <div class="message-row admin-row" *ngIf="!isUserMessage(msg)">
+          <div class="bubble bubble-admin">
+            <p class="bubble-text">{{ msg.content }}</p>
+          </div>
+          <span class="bubble-time bubble-time-right">{{ msg.createdAt }}</span>
         </div>
-        <span class="bubble-time bubble-time-right">{{ msg.createdAt }}</span>
-      </div>
+      </ng-container>
     </ng-container>
-
   </div>
 </ion-content>
 
 <!-- Painel → FORA do ion-content -->
-<ion-footer class="admin-footer">
+<ion-footer class="admin-footer" *ngIf="isAdmin">
   <div class="admin-panel">
     <p class="panel-title">Painel Administrativo</p>
 
@@ -167,11 +173,23 @@
       </div>
 
       <div class="action-buttons">
-        <ion-button expand="block" type="submit" class="btn-submit" [disabled]="isSubmitting || !canManageTicket">
+        <ion-button
+          expand="block"
+          type="submit"
+          class="btn-submit"
+          [disabled]="isSubmitting || !canManageTicket"
+        >
           <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
           ENVIAR ATUALIZAÇÃO
         </ion-button>
-        <ion-button expand="block" fill="outline" class="btn-close" type="button" [disabled]="!canManageTicket" (click)="onCloseTicket()">
+        <ion-button
+          expand="block"
+          fill="outline"
+          class="btn-close"
+          type="button"
+          [disabled]="!canManageTicket"
+          (click)="onCloseTicket()"
+        >
           <ion-icon name="close-circle-outline" slot="start"></ion-icon>
           ENCERRAR CHAMADO
         </ion-button>

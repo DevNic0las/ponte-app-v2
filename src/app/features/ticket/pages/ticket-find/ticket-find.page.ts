@@ -43,6 +43,7 @@ import { TicketMessage } from '../../models/ticket-message.model';
 import { TicketStatusPipe, TicketStatusColorPipe } from '../../pipe/ticket-status.pipe';
 import { TokenStorageService } from '../../../../core/storage/token-storage.service';
 import { UserProfile } from 'src/app/features/profile/models/profile.model';
+import { AuthService } from '../../../auth/services/extractRole.service';
 interface SelectOption {
   label: string;
   value: string;
@@ -101,6 +102,7 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
   private readonly toastCtrl = inject(ToastController);
   private readonly tokenStorage = inject(TokenStorageService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly authService = inject(AuthService);
   // ── ViewChild ────────────────────────────────────────────────────────
   @ViewChild('chatContent') private chatContent!: IonContent;
   @ViewChild('commentArea') private commentAreaRef!: ElementRef<HTMLElement>;
@@ -115,6 +117,7 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
   commentFocused = false;
   commentLength = 0;
   requesterInitials: string = '';
+  isAdmin = false;
   private shouldScrollToBottom = false;
   private ticketPublicId = '';
 
@@ -154,7 +157,13 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
   ngOnInit(): void {
     this.buildForm();
     this.loadTicketData();
-    this.loadTechnicians();
+    this.authService.isAdmin$.subscribe((isAdmin) => {
+      this.isAdmin = isAdmin;
+
+      if (isAdmin) {
+        this.loadTechnicians();
+      }
+    });
   }
 
   ngAfterViewChecked(): void {
@@ -319,6 +328,8 @@ export class TicketFindPage implements OnInit, AfterViewChecked {
     this.ticketService.findTicketById(publicId).subscribe({
       next: (data) => {
         this.ticket = data;
+        console.log(data);
+        
         this.canManageTicket =
           !data.assignedTo || data.assignedTo.publicId === this.currentUserPublicId;
 
