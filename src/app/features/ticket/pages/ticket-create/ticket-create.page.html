@@ -28,7 +28,7 @@
         ></ion-input>
       </div>
 
-      <div class="field-group">
+      <div class="field-group" *ngIf="isAdmin">
         <label class="field-label">Atribuir requerente</label>
         <ion-select
           formControlName="requestedBy"

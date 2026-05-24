@@ -36,6 +36,7 @@ import { firstValueFrom, Observable, Subject, switchMap, tap } from 'rxjs';
 import { ToastService } from 'src/app/shared/services/toast';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { UserProfile } from 'src/app/features/profile/models/profile.model';
+import { AuthService } from 'src/app/features/auth/services/extractRole.service';
 @Component({
   selector: 'app-ticket-create',
   templateUrl: './ticket-create.page.html',
@@ -69,7 +70,7 @@ export class TicketCreatePage implements OnInit {
   private readonly ticketService$ = inject(TicketService);
   private readonly navCtrl = inject(NavController);
   private readonly toastService$ = inject(ToastService);
-
+  private readonly authService = inject(AuthService);
   categories$!: Observable<Category[]>;
 
   private categoryChange$ = new Subject<string>();
@@ -79,7 +80,7 @@ export class TicketCreatePage implements OnInit {
   sectors: Sector[] = []; // lista local pra consultar
 
   requestedBy: UserProfile[] = [];
-
+  isAdmin = false;
   subcategories$ = this.categoryChange$.pipe(
     switchMap((categoryId) => this.ticketService$.getSubcategories(categoryId)),
     tap((subs) => (this.subcategories = subs)), // guarda localmente
@@ -133,6 +134,16 @@ export class TicketCreatePage implements OnInit {
     });
     this.ticketService$.getAllRequesters().subscribe((requesters) => {
       this.requestedBy = requesters;
+    });
+    this.authService.isAdmin$.subscribe((isAdmin) => {
+      this.isAdmin = isAdmin;
+      const control = this.form.get('requestedBy');
+      if (isAdmin) {
+        control?.setValidators(Validators.required);
+      } else {
+        control?.clearValidators();
+      }
+      control?.updateValueAndValidity();
     });
   }
 

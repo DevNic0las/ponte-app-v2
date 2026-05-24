@@ -4,16 +4,28 @@
       <ion-icon name="home-outline"></ion-icon>
       <ion-label>Início</ion-label>
     </ion-tab-button>
-    <ion-tab-button routerLink="/tickets" routerLinkActive="tab-selected">
-      <ion-icon name="ticket-outline"></ion-icon>
-      <ion-label>Atendimento</ion-label>
-    </ion-tab-button>
+
+    <ng-container *ngIf="ticketRoute$ | async as route">
+      <ion-tab-button
+        [routerLink]="route.commands"
+        [queryParams]="route.queryParams"
+        routerLinkActive="tab-selected"
+      >
+        <ion-icon name="ticket-outline"></ion-icon>
+        <ion-label>Atendimento</ion-label>
+      </ion-tab-button>
+    </ng-container>
     <ng-container *ngIf="isReady$ | async">
-      <ion-tab-button routerLink="/dashboard" routerLinkActive="tab-selected" *ngIf="isTechnician$ | async">
+      <ion-tab-button
+        routerLink="/dashboard"
+        routerLinkActive="tab-selected"
+        *ngIf="isTechnician$ | async"
+      >
         <ion-icon name="bar-chart-outline"></ion-icon>
         <ion-label>Dashboard</ion-label>
       </ion-tab-button>
     </ng-container>
+
     <ion-tab-button routerLink="/profile" routerLinkActive="tab-selected">
       <ion-icon name="person-outline"></ion-icon>
       <ion-label>Perfil</ion-label>

@@ -5,7 +5,9 @@
         <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title class="ion-text-center">ATENDIMENTO</ion-title>
+   <ion-title class="ion-text-center">
+  {{ mode === 'my' ? 'MEUS CHAMADOS' : 'ATENDIMENTO' }}
+</ion-title>
   </ion-toolbar>
 </ion-header>
 

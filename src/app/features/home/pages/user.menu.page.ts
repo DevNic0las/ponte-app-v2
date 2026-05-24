@@ -87,7 +87,7 @@ export class UserMenuPage {
   async navigate(route: string) {
     if (route === '/tickets/my-tickets') {
       const isAdmin = await firstValueFrom(this.authService.isAdmin$);
-      this.router.navigate([isAdmin ? '/tickets/list' : '/tickets/my-tickets']);
+      this.router.navigate(['/tickets/list'], { queryParams: isAdmin ? {} : { mode: 'my' } });
       return;
     }
     this.router.navigate([route]);

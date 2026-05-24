@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, computed, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { addIcons } from 'ionicons';
 import {
   arrowBack,
@@ -33,7 +33,7 @@ import { TicketService } from '../../services/ticket.service';
 import { TicketResponse, TicketStatus } from '../../models/ticket.model';
 import { TicketListCardComponent } from '../../../../shared/components/ticket-list-card/ticket-list-card.component';
 import { BottomNavComponent } from 'src/app/shared/components/bottom-nav/bottom-nav.component';
-import { ActivatedRoute } from '@angular/router';
+
 export interface FilterOption {
   value: string;
   label: string;
@@ -69,7 +69,10 @@ export class TicketListPage implements OnInit {
 
   private readonly ticketService = inject(TicketService);
   private readonly router = inject(Router);
-  private readonly activeRoute = inject(ActivatedRoute);
+
+  // 'all' = todos os tickets (técnico), 'my' = só os do usuário logado (solicitante)
+  mode = inject(ActivatedRoute).snapshot.queryParamMap.get('mode') || 'all';
+
   tickets = signal<TicketResponse[]>([]);
   isLoading = signal(true);
   error = signal<string | null>(null);
@@ -127,10 +130,21 @@ export class TicketListPage implements OnInit {
     this.error.set(null);
 
     const status = this.activeFilter();
-    const request$ =
-      status === 'all'
-        ? this.ticketService.listTickets()
-        : this.ticketService.listTicketsByStatus(status as TicketStatus);
+    const isMyMode = this.mode === 'my';
+
+    let request$;
+
+    if (isMyMode) {
+      request$ =
+        status === 'all'
+          ? this.ticketService.findMyTickets()
+          : this.ticketService.findMyTicketsByStatus(status as TicketStatus);
+    } else {
+      request$ =
+        status === 'all'
+          ? this.ticketService.listTickets()
+          : this.ticketService.listTicketsByStatus(status as TicketStatus);
+    }
 
     request$.subscribe({
       next: (data) => {
@@ -170,8 +184,6 @@ export class TicketListPage implements OnInit {
   }
 
   onTicketSelected(ticket: TicketResponse): void {
-    console.log(ticket.publicId);
-
     this.router.navigate(['/tickets/find', ticket.publicId]);
   }
 }

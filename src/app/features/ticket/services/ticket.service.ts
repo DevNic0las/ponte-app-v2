@@ -108,4 +108,18 @@ export class TicketService {
   listTicketsByStatus(status: TicketStatus): Observable<TicketResponse[]> {
     return this.http.get<TicketResponse[]>(`${this.apiUrl}/tickets/status?status_ticket=${status}`);
   }
+  listMyTickets(status: TicketStatus): Observable<TicketResponse[]> {
+    return this.http.get<TicketResponse[]>(
+      `${this.apiUrl}/my/tickets/status?status_ticket=${status}`,
+    );
+  }
+  findMyTickets(): Observable<TicketResponse[]> {
+    return this.http.get<TicketResponse[]>(`${this.apiUrl}/tickets/my/tickets`);
+  }
+
+  findMyTicketsByStatus(status: TicketStatus): Observable<TicketResponse[]> {
+    return this.http.get<TicketResponse[]>(
+      `${this.apiUrl}/tickets/my/tickets/status?status_ticket=${status}`,
+    );
+  }
 }

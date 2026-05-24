@@ -75,12 +75,25 @@ export class ProfilePage implements OnInit {
   selectedAvatar = signal<string>('');
 
   mockAvatars = [
-    'https://i.pravatar.cc/150?img=11',
-    'https://i.pravatar.cc/150?img=16',
-    'https://i.pravatar.cc/150?img=25',
-    'https://i.pravatar.cc/150?img=47',
-    'https://i.pravatar.cc/150?img=57',
-    'https://i.pravatar.cc/150?img=64',
+    '../../../assets/avatars/1.png',
+    '../../../assets/avatars/2.png',
+    '../../../assets/avatars/3.png',
+    '../../../assets/avatars/4.png',
+    '../../../assets/avatars/5.png',
+    '../../../assets/avatars/6.png',
+    '../../../assets/avatars/7.png',
+    '../../../assets/avatars/8.png',
+    '../../../assets/avatars/9.png',
+    '../../../assets/avatars/11.png',
+    '../../../assets/avatars/12.png',
+    '../../../assets/avatars/13.png',
+    '../../../assets/avatars/14.png',
+    '../../../assets/avatars/15.png',
+    '../../../assets/avatars/16.png',
+    '../../../assets/avatars/17.png',
+    '../../../assets/avatars/18.png',
+    '../../../assets/avatars/19.png',
+    '../../../assets/avatars/20.png',
   ];
 
   constructor() {
