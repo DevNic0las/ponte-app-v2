@@ -35,6 +35,7 @@ import { TicketService } from '../../services/ticket.service';
 import { firstValueFrom, Observable, Subject, switchMap, tap } from 'rxjs';
 import { ToastService } from 'src/app/shared/services/toast';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { UserProfile } from 'src/app/features/profile/models/profile.model';
 @Component({
   selector: 'app-ticket-create',
   templateUrl: './ticket-create.page.html',
@@ -77,6 +78,8 @@ export class TicketCreatePage implements OnInit {
 
   sectors: Sector[] = []; // lista local pra consultar
 
+  requestedBy: UserProfile[] = [];
+
   subcategories$ = this.categoryChange$.pipe(
     switchMap((categoryId) => this.ticketService$.getSubcategories(categoryId)),
     tap((subs) => (this.subcategories = subs)), // guarda localmente
@@ -92,6 +95,7 @@ export class TicketCreatePage implements OnInit {
     subcategory: ['', Validators.required],
     sector: ['', Validators.required],
     category: ['', Validators.required],
+    requestedBy: ['', Validators.required],
   });
   isLoading = false;
 
@@ -126,6 +130,9 @@ export class TicketCreatePage implements OnInit {
 
     this.form.get('subcategory')!.valueChanges.subscribe((id) => {
       if (id) this.onSubcategoryChange(id);
+    });
+    this.ticketService$.getAllRequesters().subscribe((requesters) => {
+      this.requestedBy = requesters;
     });
   }
 
@@ -173,14 +180,14 @@ export class TicketCreatePage implements OnInit {
       return;
     }
 
-    const { title, description, sector, subcategory } = this.form.getRawValue();
-    const payload: TicketRequest = { title, description, sector, subcategory };
+    const { title, description, sector, subcategory, requestedBy } = this.form.getRawValue();
+    const payload: TicketRequest = { title, description, sector, subcategory, requestedBy };
 
     try {
       this.isLoading = true;
       await firstValueFrom(this.ticketService$.createTicket(payload));
       this.toastService$.success('Chamado criado com sucesso');
-      // this.navCtrl.back();
+      this.navCtrl.back();
     } catch (error) {
       console.error('Erro ao criar chamado', error);
       this.toastService$.error('Erro ao criar chamado');

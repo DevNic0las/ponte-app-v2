@@ -97,6 +97,11 @@ export class TicketService {
   getTechnicians(): Observable<UserProfile[]> {
     return this.http.get<UserProfile[]>(`${this.apiUrl}/users/technicians`);
   }
+
+  getAllRequesters(): Observable<UserProfile[]> {
+    return this.http.get<UserProfile[]>(`${this.apiUrl}/users/requesters`);
+  }
+
   softDeleteTicket(id: string): Observable<TicketResponse> {
     return this.http.patch<TicketResponse>(`${this.apiUrl}/tickets/${id}/close`, null);
   }
