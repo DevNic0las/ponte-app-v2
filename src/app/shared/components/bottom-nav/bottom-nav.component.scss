@@ -1,0 +1,42 @@
+.bottom-nav-footer {
+  box-shadow: none;
+
+  // Só esconde em desktop quando NÃO estiver em modo mobile simulado
+  // Comente esta regra durante desenvolvimento no browser
+  // @media (min-width: 1024px) {
+  //   display: none;
+  // }
+}
+
+.bottom-nav {
+  --background: var(--color-surface);
+  --border: none;
+  --color: var(--color-text-muted);
+  --color-selected: var(--color-primary);
+
+  border-top: 1px solid var(--color-border-subtle);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bottom-nav__tab {
+  &.tab-selected {
+    ion-icon {
+      background-color: var(--color-primary-subtle);
+      border-radius: 16px;
+      padding: 4px 20px;
+    }
+  }
+}
+
+.bottom-nav__icon {
+  font-size: 1.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.bottom-nav__label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}

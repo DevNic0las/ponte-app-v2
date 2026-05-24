@@ -1,0 +1,48 @@
+<!-- ticket-list-card.component.html -->
+
+<div
+  class="list-card"
+  ion-activatable
+  (click)="onCardClick()"
+>
+  <ion-ripple-effect></ion-ripple-effect>
+
+  <!-- Barra lateral de status -->
+  <div
+    class="list-card__accent"
+    [style.background-color]="statusConfig.accentColor"
+  ></div>
+
+  <div class="list-card__body">
+
+    <!-- Linha superior: código + badge -->
+    <div class="list-card__header">
+      <span
+        class="list-card__badge"
+        [ngClass]="statusConfig.badgeCssClass"
+      >
+        {{ statusConfig.label }}
+      </span>
+    </div>
+
+    <!-- Título -->
+    <p class="list-card__title">{{ ticket.title }}</p>
+
+    <!-- Descrição com clamp visual -->
+    <p class="list-card__description">{{ ticket.description }}</p>
+
+    <!-- Rodapé -->
+    <div class="list-card__footer">
+      <div class="list-card__requester">
+        <div class="list-card__avatar">{{ ticket.requestedBy.name | slice:0:2 | uppercase }}</div> 
+        <span class="list-card__requester-name" *ngIf="ticket.assignedTo">
+          {{ ticket.assignedTo.name }}
+        </span>
+      </div>
+      <span class="list-card__date">
+        {{ ticket.createdAt | date: "dd/MM/yyyy '•' HH:mm" }}
+      </span>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,56 @@
+<div class="ion-page">
+
+  <!-- Header -->
+  <ion-header class="ion-no-border support-header">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-button (click)="goBack()" class="back-btn">
+          <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title class="support-title">Atendimento</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Content -->
+  <ion-content class="support-content">
+    <div class="support-wrapper">
+
+      <!-- Page Heading -->
+      <div class="support-heading">
+        <span class="support-label">DETALHES DO TICKET</span>
+        <h1 class="support-h1">Atendimento</h1>
+      </div>
+
+      <!-- Action Cards -->
+      <div class="action-list">
+
+        <button class="action-card" (click)="goToMyTickets()">
+          <div class="action-icon-wrap">
+            <ion-icon name="ticket-outline"></ion-icon>
+          </div>
+          <div class="action-text">
+            <span class="action-title">Meus chamados</span>
+            <span class="action-subtitle">
+              Consulte o histórico e o status dos seus tickets.
+            </span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="action-chevron"></ion-icon>
+        </button>
+
+      </div>
+
+      <!-- Info Section -->
+      <div class="info-section">
+        <h3 class="info-title">CENTRAL DE AJUDA</h3>
+        <p class="info-body">
+          Escolha a categoria que melhor descreve sua necessidade.
+          O tempo médio de resposta para chamados de nível crítico
+          é de <strong>2 horas úteis</strong>.
+        </p>
+      </div>
+
+    </div>
+  </ion-content>
+
+</div>
