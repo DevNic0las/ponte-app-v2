@@ -9,9 +9,6 @@ import { AuthService } from '../services/auth.service';
 import { TokenStorageService } from 'src/app/core/storage/token-storage.service';
 import { firstValueFrom } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
-// Caso queira integrar um AuthService real, descomente e injete abaixo.
-// import { AuthService } from 'src/app/services/auth.service';
-
 @Component({
   selector: 'app-login',
   templateUrl: './auth.page.html',
@@ -72,8 +69,12 @@ export class LoginPage implements OnInit {
       } else {
         await this.router.navigateByUrl('/dashboard', { replaceUrl: true });
       }
-    } catch (error) {
-      console.error('Login failed:', error);
+    } catch (error: any) {
+      if (error?.status === 401) {
+        this.errorMessage = 'Email ou senha incorretos';
+      } else {
+        this.errorMessage = 'Erro ao realizar login. Tente novamente.';
+      }
     } finally {
       this.isLoading = false;
     }
