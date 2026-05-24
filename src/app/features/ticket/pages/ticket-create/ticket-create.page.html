@@ -29,6 +29,20 @@
       </div>
 
       <div class="field-group">
+        <label class="field-label">Atribuir requerente</label>
+        <ion-select
+          formControlName="requestedBy"
+          interface="action-sheet"
+          placeholder="Selecione o requerente"
+          class="custom-select"
+        >
+          <ion-select-option *ngFor="let r of requestedBy" [value]="r.publicId">
+            {{ r.name }}
+          </ion-select-option>
+        </ion-select>
+      </div>
+
+      <div class="field-group">
         <label class="field-label">Departamento de TI</label>
         <ion-select
           formControlName="category"

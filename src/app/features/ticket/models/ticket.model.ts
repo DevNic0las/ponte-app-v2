@@ -5,6 +5,7 @@ export interface TicketRequest {
   description: string;
   subcategory: string;
   sector: string;
+  requestedBy: string;
 }
 
 export interface TicketUpdatePayload {

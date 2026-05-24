@@ -24,6 +24,8 @@ import {
   chevronForwardOutline,
 } from 'ionicons/icons'; // Ícones específicos
 import { BottomNavComponent } from 'src/app/shared/components/bottom-nav/bottom-nav.component';
+import { AuthService } from '../../auth/services/extractRole.service';
+import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-user-menu',
   templateUrl: './user.menu.page.html',
@@ -46,6 +48,7 @@ import { BottomNavComponent } from 'src/app/shared/components/bottom-nav/bottom-
 })
 export class UserMenuPage {
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
   actions = [
     {
       icon: 'build-outline',
@@ -57,7 +60,7 @@ export class UserMenuPage {
       icon: 'ticket-outline',
       title: 'Meus Chamados',
       description: 'Consulte o histórico e o status dos seus tickets.',
-      route: '/my-tickets',
+      route: '/tickets/my-tickets',
     },
   ];
 
@@ -81,7 +84,12 @@ export class UserMenuPage {
     this.router.navigate(['/tickets/create']);
   }
 
-  navigate(route: string) {
+  async navigate(route: string) {
+    if (route === '/tickets/my-tickets') {
+      const isAdmin = await firstValueFrom(this.authService.isAdmin$);
+      this.router.navigate([isAdmin ? '/tickets/list' : '/tickets/my-tickets']);
+      return;
+    }
     this.router.navigate([route]);
   }
 }
