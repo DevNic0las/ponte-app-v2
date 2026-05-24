@@ -18,11 +18,14 @@ export class AuthService {
 
   role$ = this.roleSubject.asObservable();
   isAdmin$ = this.role$.pipe(map((r) => r === 'TECHNICIAN'));
+  private isReadySubject = new BehaviorSubject<boolean>(false);
+  isReady$ = this.isReadySubject.asObservable();
 
   async loadRoleFromStorage(): Promise<void> {
     const token = await this.tokenStorage.getToken();
     const role = this.extractRole(token);
     this.roleSubject.next(role);
+    this.isReadySubject.next(true); // ← sinaliza que terminou
   }
 
   refreshRole(token: string): void {

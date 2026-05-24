@@ -33,8 +33,8 @@ import { AuthService } from '../../../features/auth/services/extractRole.service
 })
 export class BottomNavComponent {
   private authService = inject(AuthService);
+  isReady$ = this.authService.isReady$;
   isTechnician$ = this.authService.isAdmin$;
-
   constructor() {
     addIcons({
       homeOutline,
